@@ -5,10 +5,128 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="manifest" href="manifest.json" />
 <title>Routine App</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #e8f0fe;
+    }
+
+    h1 {
+        text-align: center;
+        color: #0d47a1;
+    }
+
+    .step {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px;
+        margin: 10px 0;
+        background: white;
+        border-radius: 10px;
+        border: 1px solid #bbdefb;
+        cursor: pointer;
+    }
+
+    .step:hover {
+        background: #e3f2fd;
+    }
+
+    .step button {
+        padding: 6px 12px;
+        border: none;
+        background: #1e88e5;
+        color: white;
+        border-radius: 6px;
+        font-size: 14px;
+        pointer-events: none; /* important: whole line is clickable */
+    }
+
+    #durationBtn {
+        margin-top: 25px;
+        padding: 14px;
+        width: 100%;
+        border: none;
+        background: #43a047;
+        color: white;
+        font-size: 18px;
+        border-radius: 10px;
+    }
+</style>
+
 </head>
 <body>
+
 <h1>Routine Steps</h1>
+
 <div id="steps"></div>
-<script src="app.js"></script>
+
+<button id="durationBtn" onclick="showTotalDuration()">Show total routine duration</button>
+
+<script>
+// Step names
+const steps = [
+    "Start wake-up",
+    "Out of bed",
+    "In Bathroom",
+    "Finished ready",
+    "In kitchen",
+    "Sitting down for breakfast",
+    "Finish eating",
+    "In Bathroom teeth",
+    "Finish brushing teeth",
+    "Out of bathroom - Kitchen"
+];
+
+// Build UI dynamically
+let firstTimestamp = null;
+let lastTimestamp = null;
+
+function renderSteps() {
+    const container = document.getElementById("steps");
+    steps.forEach(step => {
+        const div = document.createElement("div");
+        div.className = "step";
+        div.innerHTML = `
+            <span>${step}</span>
+            <button>Record time</button>
+        `;
+        div.onclick = () => recordTime(step);
+        container.appendChild(div);
+    });
+}
+
+function recordTime(stepName) {
+    const now = new Date();
+
+    if (!firstTimestamp) {
+        firstTimestamp = now;
+    }
+
+    lastTimestamp = now;
+
+    const time = now.toLocaleTimeString();
+    alert(stepName + " recorded at " + time);
+}
+
+function showTotalDuration() {
+    if (!firstTimestamp || !lastTimestamp) {
+        alert("You must record at least two steps.");
+        return;
+    }
+
+    const diffMs = lastTimestamp - firstTimestamp;
+    const minutes = Math.floor(diffMs / 60000);
+    const seconds = Math.floor((diffMs % 60000) / 1000);
+
+    alert("Total routine duration: " + minutes + " min " + seconds + " sec");
+}
+
+// Initialize UI
+renderSteps();
+</script>
+
 </body>
 </html>
