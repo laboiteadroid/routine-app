@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Routine History</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="menu">
+    <a href="index.html">Routine</a>
+    <a href="history.html" class="active">History</a>
+  </div>
+
+  <header class="header">
+    <h1>History</h1>
+    <p class="subtitle">Saved total durations</p>
+  </header>
+
+  <main class="container">
+    <div id="historyList" class="card"></div>
+    <button class="saveBtn" onclick="clearHistory()" style="background:#e53935">Clear history</button>
+  </main>
+
+<script>
+function loadHistory() {
+  const container = document.getElementById("historyList");
+  container.innerHTML = '';
+  const history = JSON.parse(localStorage.getItem("routine_history") || "[]");
+  if (history.length === 0) {
+    container.innerHTML = "<p>No entries yet.</p>";
+    return;
+  }
+  history.reverse().forEach(entry => {
+    const div = document.createElement("div");
+    div.className = "entry";
+    div.innerHTML = `<strong>${entry.date}</strong><div class="muted">Duration: ${entry.duration}</div>`;
+    container.appendChild(div);
+  });
+}
+
+function clearHistory() {
+  if (!confirm('Clear history?')) return;
+  localStorage.removeItem('routine_history');
+  loadHistory();
+}
+
+document.addEventListener('DOMContentLoaded', loadHistory);
+</script>
+</body>
+</html>
