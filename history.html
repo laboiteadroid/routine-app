@@ -1,60 +1,55 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Routine History</title>
-<link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>Routine History</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
 </head>
+
 <body>
-  <div class="menu">
-    <a href="index.html">Routine</a>
-    <a href="history.html" class="active">History</a>
-  </div>
 
-  <header class="header">
-    <h1>History</h1>
-    <p class="subtitle">Saved total durations</p>
-  </header>
+<header>
+    <nav>
+        <a href="index.html">Routine</a>
+        <a href="history.html" class="active">History</a>
+    </nav>
+</header>
 
-  <main class="container">
-    <div id="historyList" class="card"></div>
-    <button class="saveBtn" onclick="clearHistory()" style="background:#e53935">Clear history</button>
-  </main>
+<h2>Routine History</h2>
+
+<div id="historyList"></div>
 
 <script>
-function loadHistory() {
-  const container = document.getElementById("historyList");
-  container.innerHTML = '';
-  const history = JSON.parse(localStorage.getItem("routine_history") || "[]");
-  if (history.length === 0) {
-    container.innerHTML = "<p>No entries yet.</p>";
-    return;
-  }
-  history.reverse().forEach(entry => {
-    const div = document.createElement("div");
-    div.className = "entry";
-    div.innerHTML = `
-  <strong>${entry.date}</strong>
-  <div class="muted">Start: ${entry.start}</div>
-  <div class="muted">End: ${entry.end}</div>
-  <div class="muted">Duration: ${entry.duration}</div>
-  <hr>
-  <div><strong>Step breakdown:</strong></div>
-  ${entry.breakdown.map(b => `<div class="muted">${b}</div>`).join("")}
-`;
-    container.appendChild(div);
-  });
-}
+document.addEventListener("DOMContentLoaded", () => {
+    const history = JSON.parse(localStorage.getItem("routine_history") || "[]");
+    const container = document.getElementById("historyList");
 
-function clearHistory() {
-  if (!confirm('Clear history?')) return;
-  localStorage.removeItem('routine_history');
-  loadHistory();
-}
+    if (history.length === 0) {
+        container.innerHTML = "<p>No history yet.</p>";
+        return;
+    }
 
-document.addEventListener('DOMContentLoaded', loadHistory);
+    history.forEach(entry => {
+        const div = document.createElement("div");
+        div.className = "history-entry";
+
+        div.innerHTML = `
+            <strong>${entry.date}</strong>
+            <div class="muted">Start: ${entry.start}</div>
+            <div class="muted">End: ${entry.end}</div>
+            <div class="muted">Duration: ${entry.duration}</div>
+            <hr>
+            <div><strong>Step breakdown:</strong></div>
+            ${entry.breakdown.map(b => `<div class="muted">${b}</div>`).join("")}
+        `;
+
+        container.appendChild(div);
+    });
+});
 </script>
+
 </body>
 </html>
