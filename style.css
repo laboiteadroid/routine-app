@@ -104,3 +104,43 @@ button:hover {
     color: #444;
     margin-left: 10px;
 }
+/* PRINT MODE — compact, ink-friendly */
+@media print {
+
+    /* Remove navigation bar, buttons, background color */
+    nav, button, h2 {
+        display: none !important;
+    }
+
+    body {
+        background: white !important;
+    }
+
+    /* Compact history entries */
+    .history-entry {
+        border: 1px solid #aaa;
+        padding: 6px 8px;
+        margin: 6px 0;
+        border-radius: 0;
+        background: white;
+        page-break-inside: avoid;
+    }
+
+    /* Smaller text so more days fit per page */
+    .history-entry strong {
+        font-size: 14px;
+    }
+
+    .muted {
+        font-size: 12px;
+    }
+
+    hr {
+        margin: 4px 0;
+    }
+
+    /* Reduced margins on printed page */
+    @page {
+        margin: 12mm;
+    }
+}
