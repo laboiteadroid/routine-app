@@ -1,26 +1,41 @@
-// Track timestamps for each step
+// Timestamp storage for each step
 let stepTimes = {};
 let firstTimestamp = null;
 let lastTimestamp = null;
 
-// Called when user clicks a step
+// List of step names (for breakdown in History)
+const stepNames = [
+    "", // index 0 unused
+    "Start wake-up",
+    "Out of bed",
+    "In Bathroom",
+    "Finished ready",
+    "In kitchen",
+    "Sitting down for breakfast",
+    "Finish eating",
+    "In Bathroom teeth",
+    "Finish brushing teeth",
+    "Out of bathroom - Kitchen"
+];
+
+// Called when user taps a step
 function recordTime(stepIndex) {
     const now = new Date();
 
-    // Save timestamp for this step
+    // Save timestamp
     stepTimes[stepIndex] = now;
 
     if (!firstTimestamp) firstTimestamp = now;
     lastTimestamp = now;
 
-    // Update UI: show time
+    // Display time
     const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     document.getElementById(`time-${stepIndex}`).textContent = timeStr;
 
-    // Update UI: calculate durations between steps
+    // Update durations between steps
     updateStepDurations();
 
-    // Update focus
+    // Update focus text
     const next = stepIndex + 1;
     if (next <= 10) {
         document.getElementById("focusStep").textContent =
@@ -29,10 +44,10 @@ function recordTime(stepIndex) {
         document.getElementById("focusStep").textContent = "Routine completed!";
     }
 
-    alert(document.getElementById(`label-${stepIndex}`).textContent + " recorded at " + timeStr);
+    alert(stepNames[stepIndex] + " recorded at " + timeStr);
 }
 
-// Calculate (+Xm / +XmYs) durations
+// Calculates (+Xm) between each consecutive step
 function updateStepDurations() {
     for (let i = 2; i <= 10; i++) {
         if (stepTimes[i] && stepTimes[i - 1]) {
@@ -48,7 +63,7 @@ function updateStepDurations() {
     }
 }
 
-// Show total duration
+// Show the total routine duration
 function showTotalDuration() {
     if (!firstTimestamp || !lastTimestamp) {
         alert("You must record at least two steps.");
@@ -62,7 +77,7 @@ function showTotalDuration() {
     alert("Total routine duration: " + minutes + " min " + seconds + " sec");
 }
 
-// Save all data to history
+// Save routine data to history
 function saveToHistory() {
     if (!firstTimestamp || !lastTimestamp) {
         alert("You must record the routine first.");
@@ -75,21 +90,22 @@ function saveToHistory() {
     const seconds = Math.floor((diffMs % 60000) / 1000);
     const totalDuration = minutes + " min " + seconds + " sec";
 
-    const startTime = firstTimestamp.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
-    const endTime = lastTimestamp.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+    const startTime = firstTimestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const endTime = lastTimestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    // Step-by-step durations
+    // Step-by-step breakdown with names
     let breakdown = [];
     for (let i = 2; i <= 10; i++) {
         if (stepTimes[i] && stepTimes[i - 1]) {
             const diff = stepTimes[i] - stepTimes[i - 1];
             const m = Math.floor(diff / 60000);
             const s = Math.floor((diff % 60000) / 1000);
-            breakdown.push(`${i - 1}→${i}: ${m}m${s}s`);
+
+            breakdown.push(`${stepNames[i - 1]} → ${stepNames[i]} : ${m}m${s}s`);
         }
     }
 
-    // Store in localStorage
+    // History entry object
     const entry = {
         date: new Date().toLocaleDateString(),
         start: startTime,
@@ -98,6 +114,7 @@ function saveToHistory() {
         breakdown: breakdown
     };
 
+    // Save to localStorage
     let history = JSON.parse(localStorage.getItem("routine_history") || "[]");
     history.push(entry);
     localStorage.setItem("routine_history", JSON.stringify(history));
