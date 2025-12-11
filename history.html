@@ -20,6 +20,12 @@
 
 <h2>Routine History</h2>
 
+<!-- NEW BUTTONS -->
+<div style="margin-left: 15px;">
+    <button onclick="window.print()">Print history</button>
+    <button onclick="clearHistory()">Clear history</button>
+</div>
+
 <div id="historyList"></div>
 
 <script>
@@ -28,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const container = document.getElementById("historyList");
 
     if (history.length === 0) {
-        container.innerHTML = "<p>No history yet.</p>";
+        container.innerHTML = "<p style='margin:15px;'>No history yet.</p>";
         return;
     }
 
@@ -49,6 +55,14 @@ document.addEventListener("DOMContentLoaded", () => {
         container.appendChild(div);
     });
 });
+
+// NEW FUNCTION
+function clearHistory() {
+    if (confirm("Are you sure you want to delete ALL history?")) {
+        localStorage.removeItem("routine_history");
+        location.reload();
+    }
+}
 </script>
 
 </body>
