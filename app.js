@@ -17,10 +17,10 @@ function recordTime(stepIndex) {
     const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     document.getElementById(`time-${stepIndex}`).textContent = timeStr;
 
-    // Update UI: calculate step-to-step durations
+    // Update UI: calculate durations between steps
     updateStepDurations();
 
-    // Update current focus
+    // Update focus
     const next = stepIndex + 1;
     if (next <= 10) {
         document.getElementById("focusStep").textContent =
@@ -32,7 +32,7 @@ function recordTime(stepIndex) {
     alert(document.getElementById(`label-${stepIndex}`).textContent + " recorded at " + timeStr);
 }
 
-// Calculate (+Xm) durations for each step
+// Calculate (+Xm / +XmYs) durations
 function updateStepDurations() {
     for (let i = 2; i <= 10; i++) {
         if (stepTimes[i] && stepTimes[i - 1]) {
@@ -48,7 +48,7 @@ function updateStepDurations() {
     }
 }
 
-// Show total routine duration
+// Show total duration
 function showTotalDuration() {
     if (!firstTimestamp || !lastTimestamp) {
         alert("You must record at least two steps.");
@@ -62,7 +62,7 @@ function showTotalDuration() {
     alert("Total routine duration: " + minutes + " min " + seconds + " sec");
 }
 
-// Save everything to history
+// Save all data to history
 function saveToHistory() {
     if (!firstTimestamp || !lastTimestamp) {
         alert("You must record the routine first.");
@@ -85,7 +85,7 @@ function saveToHistory() {
             const diff = stepTimes[i] - stepTimes[i - 1];
             const m = Math.floor(diff / 60000);
             const s = Math.floor((diff % 60000) / 1000);
-            breakdown.push(`${i-1}→${i}: ${m}m${s}s`);
+            breakdown.push(`${i - 1}→${i}: ${m}m${s}s`);
         }
     }
 
