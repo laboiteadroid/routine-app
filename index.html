@@ -1,38 +1,115 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Routine Xavier</title>
-<link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>Routine App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- PWA manifest -->
+    <link rel="manifest" href="manifest.json">
 </head>
+
 <body>
-  <div class="menu">
-    <a href="index.html" class="active">Routine</a>
-    <a href="history.html">History</a>
-  </div>
 
-  <header class="header">
-    <h1>Morning Routine</h1>
-    <p class="subtitle">Tap a step to record the time</p>
-  </header>
+<header>
+    <nav>
+        <a href="index.html" class="active">Routine</a>
+        <a href="history.html">History</a>
+    </nav>
+</header>
 
-  <main class="container">
-    <section id="focus" class="card">
-      <h2 id="currentStepTitle">—</h2>
-      <div id="timeDisplay" class="timeSmall">—</div>
-      <button id="doneBtn" class="bigBtn">Record time</button>
-    </section>
+<h2>Current step: <span id="focusStep">Start wake-up</span></h2>
 
-    <section id="list" class="card">
-      <div id="stepsList"></div>
-    </section>
+<div class="step-list">
 
-    <button id="durationBtn" class="saveBtn" onclick="showTotalDuration()">Show total routine duration</button>
-    <button id="saveBtn" class="saveBtn saveBlue" onclick="saveToHistory()">Save duration to history</button>
-  </main>
+    <!-- STEP 1 -->
+    <div class="step" onclick="recordTime(1)">
+        <span id="label-1">Start wake-up</span>
+        <span id="time-1" class="time"></span>
+    </div>
 
+    <!-- STEP 2 -->
+    <div class="step" onclick="recordTime(2)">
+        <span id="label-2">Out of bed</span>
+        <span id="time-2" class="time"></span>
+        <span id="delta-2" class="delta"></span>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step" onclick="recordTime(3)">
+        <span id="label-3">In Bathroom</span>
+        <span id="time-3" class="time"></span>
+        <span id="delta-3" class="delta"></span>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step" onclick="recordTime(4)">
+        <span id="label-4">Finished ready</span>
+        <span id="time-4" class="time"></span>
+        <span id="delta-4" class="delta"></span>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step" onclick="recordTime(5)">
+        <span id="label-5">In kitchen</span>
+        <span id="time-5" class="time"></span>
+        <span id="delta-5" class="delta"></span>
+    </div>
+
+    <!-- STEP 6 -->
+    <div class="step" onclick="recordTime(6)">
+        <span id="label-6">Sitting down for breakfast</span>
+        <span id="time-6" class="time"></span>
+        <span id="delta-6" class="delta"></span>
+    </div>
+
+    <!-- STEP 7 -->
+    <div class="step" onclick="recordTime(7)">
+        <span id="label-7">Finish eating</span>
+        <span id="time-7" class="time"></span>
+        <span id="delta-7" class="delta"></span>
+    </div>
+
+    <!-- STEP 8 -->
+    <div class="step" onclick="recordTime(8)">
+        <span id="label-8">In Bathroom teeth</span>
+        <span id="time-8" class="time"></span>
+        <span id="delta-8" class="delta"></span>
+    </div>
+
+    <!-- STEP 9 -->
+    <div class="step" onclick="recordTime(9)">
+        <span id="label-9">Finish brushing teeth</span>
+        <span id="time-9" class="time"></span>
+        <span id="delta-9" class="delta"></span>
+    </div>
+
+    <!-- STEP 10 -->
+    <div class="step" onclick="recordTime(10)">
+        <span id="label-10">Out of bathroom - Kitchen</span>
+        <span id="time-10" class="time"></span>
+        <span id="delta-10" class="delta"></span>
+    </div>
+
+</div>
+
+<br>
+
+<button onclick="showTotalDuration()">Show total routine duration</button>
+<button onclick="saveToHistory()">Save duration to history</button>
+
+<!-- App logic -->
 <script src="app.js"></script>
+
+<!-- Service worker -->
+<script>
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js");
+}
+</script>
+
 </body>
 </html>
