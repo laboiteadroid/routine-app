@@ -1,12 +1,15 @@
-// Timestamp storage for each step
-alert("App.js VERSION: 3.0");
-let stepTimes = {};
-let firstTimestamp = null;
-let lastTimestamp = null;
+/***********************
+ * Routine App JS v3.2
+ * - Sauvegarde automatique après chaque étape
+ * - Reprise automatique de la routine interrompue
+ * - Breakdown avec noms d’étapes
+ ************************/
 
-// List of step names (for breakdown in History)
+let steps = Array(11).fill(null);  // index 1..10 utilisés
+
+// Liste des noms des étapes (index identique aux numéros d’étape)
 const stepNames = [
-    "", // index 0 unused
+    "", // index 0 inutilisé
     "Start wake-up",
     "Out of bed",
     "In Bathroom",
@@ -19,106 +22,155 @@ const stepNames = [
     "Out of bathroom - Kitchen"
 ];
 
-// Called when user taps a step
-function recordTime(stepIndex) {
+/***********************
+ * 1. Charger routine sauvegardée (si existante)
+ ************************/
+window.addEventListener("load", () => {
+    const saved = localStorage.getItem("currentRoutine");
+    if (saved) {
+        steps = JSON.parse(saved);
+        updateUI();
+    }
+});
+
+/***********************
+ * 2. Marquer une étape + sauvegarder
+ ************************/
+function recordStep(stepNumber) {
     const now = new Date();
+    const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    // Save timestamp
-    stepTimes[stepIndex] = now;
+    steps[stepNumber] = timeString;
+    updateUI();
 
-    if (!firstTimestamp) firstTimestamp = now;
-    lastTimestamp = now;
-
-    // Display time
-    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    document.getElementById(`time-${stepIndex}`).textContent = timeStr;
-
-    // Update durations between steps
-    updateStepDurations();
-
-    // Update focus text
-    const next = stepIndex + 1;
-    if (next <= 10) {
-        document.getElementById("focusStep").textContent =
-            document.getElementById(`label-${next}`).textContent;
-    } else {
-        document.getElementById("focusStep").textContent = "Routine completed!";
-    }
-
-    alert(stepNames[stepIndex] + " recorded at " + timeStr);
+    // 💾 sauvegarde automatique après chaque clic
+    localStorage.setItem("currentRoutine", JSON.stringify(steps));
 }
 
-// Calculates (+Xm) between each consecutive step
-function updateStepDurations() {
-    for (let i = 2; i <= 10; i++) {
-        if (stepTimes[i] && stepTimes[i - 1]) {
-            const diffMs = stepTimes[i] - stepTimes[i - 1];
-            const min = Math.floor(diffMs / 60000);
-            const sec = Math.floor((diffMs % 60000) / 1000);
+/***********************
+ * Mettre à jour l’interface
+ ************************/
+function updateUI() {
+    for (let i = 1; i <= 10; i++) {
+        const el = document.getElementById(`step${i}`);
+        if (el) el.textContent = steps[i] ? steps[i] : "--:--";
+    }
+}
 
-            const formatted =
-                sec === 0 ? `(+${min}m)` : `(+${min}m${sec}s)`;
+/***********************
+ * 3. Calculer la durée totale
+ ************************/
+function calculateDuration() {
+    let first = null;
+    let last = null;
 
-            document.getElementById(`delta-${i}`).textContent = formatted;
+    for (let i = 1; i <= 10; i++) {
+        if (steps[i]) {
+            if (!first) first = steps[i];
+            last = steps[i];
         }
     }
+
+    if (!first || !last) return null;
+
+    const [fh, fm] = first.split(":").map(Number);
+    const [lh, lm] = last.split(":").map(Number);
+
+    const start = new Date();
+    start.setHours(fh, fm, 0);
+
+    const end = new Date();
+    end.setHours(lh, lm, 0);
+
+    const diffMs = end - start;
+    const diffMin = Math.floor(diffMs / 60000);
+    const diffSec = Math.floor((diffMs % 60000) / 1000);
+
+    return { first, last, diffMin, diffSec };
 }
 
-// Show the total routine duration
-function showTotalDuration() {
-    if (!firstTimestamp || !lastTimestamp) {
-        alert("You must record at least two steps.");
-        return;
-    }
-
-    const diffMs = lastTimestamp - firstTimestamp;
-    const minutes = Math.floor(diffMs / 60000);
-    const seconds = Math.floor((diffMs % 60000) / 1000);
-
-    alert("Total routine duration: " + minutes + " min " + seconds + " sec");
-}
-
-// Save routine data to history
+/***********************
+ * 4. Enregistrer dans l’historique
+ ************************/
 function saveToHistory() {
-    if (!firstTimestamp || !lastTimestamp) {
-        alert("You must record the routine first.");
+    const d = calculateDuration();
+    if (!d) {
+        alert("Not enough steps recorded.");
         return;
     }
 
-    // Total duration
-    const diffMs = lastTimestamp - firstTimestamp;
-    const minutes = Math.floor(diffMs / 60000);
-    const seconds = Math.floor((diffMs % 60000) / 1000);
-    const totalDuration = minutes + " min " + seconds + " sec";
-
-    const startTime = firstTimestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const endTime = lastTimestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-    // Step-by-step breakdown with names
     let breakdown = [];
-    for (let i = 2; i <= 10; i++) {
-        if (stepTimes[i] && stepTimes[i - 1]) {
-            const diff = stepTimes[i] - stepTimes[i - 1];
-            const m = Math.floor(diff / 60000);
-            const s = Math.floor((diff % 60000) / 1000);
 
-            breakdown.push(`${stepNames[i - 1]} → ${stepNames[i]} : ${m}m${s}s`);
+    for (let i = 2; i <= 10; i++) {
+        if (steps[i - 1] && steps[i]) {
+            const [h1, m1] = steps[i - 1].split(":").map(Number);
+            const [h2, m2] = steps[i].split(":").map(Number);
+
+            const t1 = new Date(); t1.setHours(h1, m1, 0);
+            const t2 = new Date(); t2.setHours(h2, m2, 0);
+
+            const dm = Math.floor((t2 - t1) / 60000);
+            const ds = Math.floor(((t2 - t1) % 60000) / 1000);
+
+            breakdown.push(`${stepNames[i - 1]} → ${stepNames[i]} : ${dm}m${ds}s`);
         }
     }
 
-    // History entry object
     const entry = {
         date: new Date().toLocaleDateString(),
-        start: startTime,
-        end: endTime,
-        duration: totalDuration,
-        breakdown: breakdown
+        start: d.first,
+        end: d.last,
+        duration: `${d.diffMin} min ${d.diffSec} sec`,
+        breakdown
     };
 
-    // Save to localStorage
-    let history = JSON.parse(localStorage.getItem("routine_history") || "[]");
+    // sauvegarde dans localStorage
+    let history = JSON.parse(localStorage.getItem("history") || "[]");
     history.push(entry);
-    localStorage.setItem("routine_history", JSON.stringify(history));
+    localStorage.setItem("history", JSON.stringify(history));
 
-    alert("Saved to history!");
+    // 🗑 effacer la routine courante
+    localStorage.removeItem("currentRoutine");
+    steps = Array(11).fill(null);
+    updateUI();
+
+    alert("Routine saved to history.");
+}
+
+/***********************
+ * 5. Charger l’historique dans la page History
+ ************************/
+function loadHistory() {
+    const container = document.getElementById("history");
+    if (!container) return;
+
+    let history = JSON.parse(localStorage.getItem("history") || "[]");
+
+    container.innerHTML = "";
+
+    history.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "history-entry";
+
+        div.innerHTML = `
+            <strong>Date:</strong> ${item.date}<br>
+            <strong>Start:</strong> ${item.start}<br>
+            <strong>End:</strong> ${item.end}<br>
+            <strong>Duration:</strong> ${item.duration}<br><br>
+            <strong>Step breakdown:</strong><br>
+            ${item.breakdown.map(line => `• ${line}`).join("<br>")}
+            <hr>
+        `;
+        container.appendChild(div);
+    });
+}
+
+/***********************
+ * 6. Effacer historique
+ ************************/
+function clearHistory() {
+    if (confirm("Clear ALL history?")) {
+        localStorage.removeItem("history");
+        loadHistory();
+    }
 }
