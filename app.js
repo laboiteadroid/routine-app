@@ -1,4 +1,5 @@
 // Timestamp storage for each step
+alert("App.js VERSION: 3.0");
 let stepTimes = {};
 let firstTimestamp = null;
 let lastTimestamp = null;
