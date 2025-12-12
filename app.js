@@ -1,14 +1,15 @@
-alert("APP.JS IS RUNNING");
 /***********************
- * Routine App JS v3.3
- * Compatible avec :
- * - onclick="recordTime(n)"
- * - id="time-n"
- * - id="label-n"
- * Avec sauvegarde automatique
+ * Routine App JS v3.4
+ * - Compatible avec recordTime(n)
+ * - Met à jour "Current step"
+ * - Sauvegarde automatique
+ * - Reprise automatique
+ * - Durée totale OK
+ * - Save to history OK
  ************************/
 
-let steps = Array(11).fill(null);  // index 1 à 10 utilisés
+let steps = Array(11).fill(null);  // indexes 1..10
+let lastCompletedStep = 0;
 
 // Liste des noms des étapes
 const stepNames = [
@@ -32,7 +33,17 @@ window.addEventListener("load", () => {
     const saved = localStorage.getItem("currentRoutine");
     if (saved) {
         steps = JSON.parse(saved);
+
+        // Trouver la dernière étape cliquée
+        for (let i = 10; i >= 1; i--) {
+            if (steps[i]) {
+                lastCompletedStep = i;
+                break;
+            }
+        }
+
         updateUI();
+        updateCurrentStep();
     }
 });
 
@@ -44,11 +55,28 @@ function recordTime(stepNumber) {
     const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
     steps[stepNumber] = timeString;
-
-    updateUI();
+    lastCompletedStep = stepNumber;
 
     // Sauvegarde automatique
     localStorage.setItem("currentRoutine", JSON.stringify(steps));
+
+    updateUI();
+    updateCurrentStep();
+}
+
+/***********************
+ * Met à jour l’affichage du current step
+ ************************/
+function updateCurrentStep() {
+    const el = document.getElementById("focusStep");
+
+    if (lastCompletedStep === 0) {
+        el.textContent = stepNames[1];
+    } else {
+        let nextStep = lastCompletedStep + 1;
+        if (nextStep > 10) nextStep = 10;
+        el.textContent = stepNames[nextStep];
+    }
 }
 
 /***********************
@@ -67,15 +95,8 @@ function updateUI() {
  * Calculer la durée totale
  ************************/
 function calculateDuration() {
-    let first = null;
-    let last = null;
-
-    for (let i = 1; i <= 10; i++) {
-        if (steps[i]) {
-            if (!first) first = steps[i];
-            last = steps[i];
-        }
-    }
+    let first = steps[1];
+    let last = steps[lastCompletedStep];
 
     if (!first || !last) return null;
 
@@ -93,7 +114,20 @@ function calculateDuration() {
 }
 
 /***********************
- * Sauvegarder dans l’historique
+ * Afficher la durée
+ ************************/
+function showTotalDuration() {
+    const d = calculateDuration();
+    if (!d) {
+        alert("Not enough steps recorded.");
+        return;
+    }
+
+    alert(`Routine total: ${d.diffMin}m ${d.diffSec}s\nStart: ${d.first}\nEnd: ${d.last}`);
+}
+
+/***********************
+ * Enregistrer dans l’historique
  ************************/
 function saveToHistory() {
     const d = calculateDuration();
@@ -104,9 +138,8 @@ function saveToHistory() {
 
     let breakdown = [];
 
-    for (let i = 2; i <= 10; i++) {
+    for (let i = 2; i <= lastCompletedStep; i++) {
         if (steps[i - 1] && steps[i]) {
-
             const [h1, m1] = steps[i - 1].split(":").map(Number);
             const [h2, m2] = steps[i].split(":").map(Number);
 
@@ -132,40 +165,15 @@ function saveToHistory() {
     history.push(entry);
     localStorage.setItem("history", JSON.stringify(history));
 
-    // Effacer la routine courante
+    // Reset
     localStorage.removeItem("currentRoutine");
     steps = Array(11).fill(null);
+    lastCompletedStep = 0;
+
     updateUI();
+    updateCurrentStep();
 
     alert("Routine saved to history.");
-}
-
-/***********************
- * Charger l’historique
- ************************/
-function loadHistory() {
-    const container = document.getElementById("history");
-    if (!container) return;
-
-    let history = JSON.parse(localStorage.getItem("history") || "[]");
-
-    container.innerHTML = "";
-
-    history.forEach(item => {
-        const div = document.createElement("div");
-        div.className = "history-entry";
-
-        div.innerHTML = `
-            <strong>Date:</strong> ${item.date}<br>
-            <strong>Start:</strong> ${item.start}<br>
-            <strong>End:</strong> ${item.end}<br>
-            <strong>Duration:</strong> ${item.duration}<br><br>
-            <strong>Step breakdown:</strong><br>
-            ${item.breakdown.map(line => `• ${line}`).join("<br>")}
-            <hr>
-        `;
-        container.appendChild(div);
-    });
 }
 
 /***********************
