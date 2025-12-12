@@ -1,15 +1,17 @@
 /***********************
- * Routine App JS v3.2
- * - Sauvegarde automatique après chaque étape
- * - Reprise automatique de la routine interrompue
- * - Breakdown avec noms d’étapes
+ * Routine App JS v3.3
+ * Compatible avec :
+ * - onclick="recordTime(n)"
+ * - id="time-n"
+ * - id="label-n"
+ * Avec sauvegarde automatique
  ************************/
 
-let steps = Array(11).fill(null);  // index 1..10 utilisés
+let steps = Array(11).fill(null);  // index 1 à 10 utilisés
 
-// Liste des noms des étapes (index identique aux numéros d’étape)
+// Liste des noms des étapes
 const stepNames = [
-    "", // index 0 inutilisé
+    "",
     "Start wake-up",
     "Out of bed",
     "In Bathroom",
@@ -23,7 +25,7 @@ const stepNames = [
 ];
 
 /***********************
- * 1. Charger routine sauvegardée (si existante)
+ * Charger routine sauvegardée
  ************************/
 window.addEventListener("load", () => {
     const saved = localStorage.getItem("currentRoutine");
@@ -34,16 +36,17 @@ window.addEventListener("load", () => {
 });
 
 /***********************
- * 2. Marquer une étape + sauvegarder
+ * Enregistrer une étape
  ************************/
-function recordStep(stepNumber) {
+function recordTime(stepNumber) {
     const now = new Date();
     const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
     steps[stepNumber] = timeString;
+
     updateUI();
 
-    // 💾 sauvegarde automatique après chaque clic
+    // Sauvegarde automatique
     localStorage.setItem("currentRoutine", JSON.stringify(steps));
 }
 
@@ -52,13 +55,15 @@ function recordStep(stepNumber) {
  ************************/
 function updateUI() {
     for (let i = 1; i <= 10; i++) {
-        const el = document.getElementById(`step${i}`);
-        if (el) el.textContent = steps[i] ? steps[i] : "--:--";
+        const el = document.getElementById(`time-${i}`);
+        if (el) {
+            el.textContent = steps[i] ? steps[i] : "--:--";
+        }
     }
 }
 
 /***********************
- * 3. Calculer la durée totale
+ * Calculer la durée totale
  ************************/
 function calculateDuration() {
     let first = null;
@@ -76,11 +81,8 @@ function calculateDuration() {
     const [fh, fm] = first.split(":").map(Number);
     const [lh, lm] = last.split(":").map(Number);
 
-    const start = new Date();
-    start.setHours(fh, fm, 0);
-
-    const end = new Date();
-    end.setHours(lh, lm, 0);
+    const start = new Date(); start.setHours(fh, fm, 0);
+    const end = new Date(); end.setHours(lh, lm, 0);
 
     const diffMs = end - start;
     const diffMin = Math.floor(diffMs / 60000);
@@ -90,7 +92,7 @@ function calculateDuration() {
 }
 
 /***********************
- * 4. Enregistrer dans l’historique
+ * Sauvegarder dans l’historique
  ************************/
 function saveToHistory() {
     const d = calculateDuration();
@@ -103,6 +105,7 @@ function saveToHistory() {
 
     for (let i = 2; i <= 10; i++) {
         if (steps[i - 1] && steps[i]) {
+
             const [h1, m1] = steps[i - 1].split(":").map(Number);
             const [h2, m2] = steps[i].split(":").map(Number);
 
@@ -124,12 +127,11 @@ function saveToHistory() {
         breakdown
     };
 
-    // sauvegarde dans localStorage
     let history = JSON.parse(localStorage.getItem("history") || "[]");
     history.push(entry);
     localStorage.setItem("history", JSON.stringify(history));
 
-    // 🗑 effacer la routine courante
+    // Effacer la routine courante
     localStorage.removeItem("currentRoutine");
     steps = Array(11).fill(null);
     updateUI();
@@ -138,7 +140,7 @@ function saveToHistory() {
 }
 
 /***********************
- * 5. Charger l’historique dans la page History
+ * Charger l’historique
  ************************/
 function loadHistory() {
     const container = document.getElementById("history");
@@ -166,7 +168,7 @@ function loadHistory() {
 }
 
 /***********************
- * 6. Effacer historique
+ * Effacer historique
  ************************/
 function clearHistory() {
     if (confirm("Clear ALL history?")) {
