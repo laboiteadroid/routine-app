@@ -1,14 +1,14 @@
 /***********************
- * Routine App JS v3.4
- * - Compatible avec recordTime(n)
- * - Met à jour "Current step"
- * - Sauvegarde automatique
- * - Reprise automatique
- * - Durée totale OK
- * - Save to history OK
+ * Routine App JS v3.5 (Stable)
+ * - lastCompletedStep corrigé et totalement fiable
+ * - Durée totale fonctionne
+ * - Save to history fonctionne
+ * - Sauvegarde automatique à chaque étape
+ * - Reprise automatique à l'ouverture
+ * - Compatible avec ton HTML
  ************************/
 
-let steps = Array(11).fill(null);  // indexes 1..10
+let steps = Array(11).fill(null);  // steps[1] à steps[10]
 let lastCompletedStep = 0;
 
 // Liste des noms des étapes
@@ -27,35 +27,41 @@ const stepNames = [
 ];
 
 /***********************
- * Charger routine sauvegardée
+ * Charger les données sauvegardées
  ************************/
 window.addEventListener("load", () => {
     const saved = localStorage.getItem("currentRoutine");
+
     if (saved) {
         steps = JSON.parse(saved);
 
-        // Trouver la dernière étape cliquée
+        // Trouver la dernière étape complétée
+        lastCompletedStep = 0;
         for (let i = 10; i >= 1; i--) {
-            if (steps[i]) {
+            if (steps[i] !== null) {
                 lastCompletedStep = i;
                 break;
             }
         }
-
-        updateUI();
-        updateCurrentStep();
     }
+
+    updateUI();
+    updateCurrentStep();
 });
 
 /***********************
- * Enregistrer une étape
+ * Enregistrer l'heure d'une étape
  ************************/
 function recordTime(stepNumber) {
     const now = new Date();
     const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
     steps[stepNumber] = timeString;
-    lastCompletedStep = stepNumber;
+
+    // Mise à jour lastCompletedStep
+    if (stepNumber > lastCompletedStep) {
+        lastCompletedStep = stepNumber;
+    }
 
     // Sauvegarde automatique
     localStorage.setItem("currentRoutine", JSON.stringify(steps));
@@ -65,22 +71,24 @@ function recordTime(stepNumber) {
 }
 
 /***********************
- * Met à jour l’affichage du current step
+ * Mettre à jour "Current step"
  ************************/
 function updateCurrentStep() {
     const el = document.getElementById("focusStep");
 
     if (lastCompletedStep === 0) {
         el.textContent = stepNames[1];
-    } else {
-        let nextStep = lastCompletedStep + 1;
-        if (nextStep > 10) nextStep = 10;
-        el.textContent = stepNames[nextStep];
+        return;
     }
+
+    let nextStep = lastCompletedStep + 1;
+    if (nextStep > 10) nextStep = 10;
+
+    el.textContent = stepNames[nextStep];
 }
 
 /***********************
- * Mettre à jour l’interface
+ * Met à jour l'affichage des heures dans l'écran Routine
  ************************/
 function updateUI() {
     for (let i = 1; i <= 10; i++) {
@@ -92,11 +100,11 @@ function updateUI() {
 }
 
 /***********************
- * Calculer la durée totale
+ * Calcul de la durée totale
  ************************/
 function calculateDuration() {
-    let first = steps[1];
-    let last = steps[lastCompletedStep];
+    const first = steps[1];
+    const last = steps[lastCompletedStep];
 
     if (!first || !last) return null;
 
@@ -107,6 +115,7 @@ function calculateDuration() {
     const end = new Date(); end.setHours(lh, lm, 0);
 
     const diffMs = end - start;
+
     const diffMin = Math.floor(diffMs / 60000);
     const diffSec = Math.floor((diffMs % 60000) / 1000);
 
@@ -114,28 +123,35 @@ function calculateDuration() {
 }
 
 /***********************
- * Afficher la durée
+ * Afficher la durée totale (popup)
  ************************/
 function showTotalDuration() {
     const d = calculateDuration();
+
     if (!d) {
         alert("Not enough steps recorded.");
         return;
     }
 
-    alert(`Routine total: ${d.diffMin}m ${d.diffSec}s\nStart: ${d.first}\nEnd: ${d.last}`);
+    alert(
+        `Routine total: ${d.diffMin}m ${d.diffSec}s\n` +
+        `Start: ${d.first}\n` +
+        `End: ${d.last}`
+    );
 }
 
 /***********************
- * Enregistrer dans l’historique
+ * Enregistrer la routine dans l'historique
  ************************/
 function saveToHistory() {
     const d = calculateDuration();
+
     if (!d) {
         alert("Not enough steps recorded.");
         return;
     }
 
+    // Créer les breakdowns
     let breakdown = [];
 
     for (let i = 2; i <= lastCompletedStep; i++) {
@@ -161,11 +177,12 @@ function saveToHistory() {
         breakdown
     };
 
+    // Sauvegarder dans localStorage
     let history = JSON.parse(localStorage.getItem("history") || "[]");
     history.push(entry);
     localStorage.setItem("history", JSON.stringify(history));
 
-    // Reset
+    // Réinitialisation de la routine
     localStorage.removeItem("currentRoutine");
     steps = Array(11).fill(null);
     lastCompletedStep = 0;
@@ -177,7 +194,35 @@ function saveToHistory() {
 }
 
 /***********************
- * Effacer historique
+ * Charger l'historique dans la page History
+ ************************/
+function loadHistory() {
+    const container = document.getElementById("history");
+    if (!container) return;
+
+    let history = JSON.parse(localStorage.getItem("history") || "[]");
+
+    container.innerHTML = "";
+
+    history.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "history-entry";
+
+        div.innerHTML = `
+            <strong>Date:</strong> ${item.date}<br>
+            <strong>Start:</strong> ${item.start}<br>
+            <strong>End:</strong> ${item.end}<br>
+            <strong>Duration:</strong> ${item.duration}<br><br>
+            <strong>Step breakdown:</strong><br>
+            ${item.breakdown.map(line => `• ${line}`).join("<br>")}
+            <hr>
+        `;
+        container.appendChild(div);
+    });
+}
+
+/***********************
+ * Effacer l'historique
  ************************/
 function clearHistory() {
     if (confirm("Clear ALL history?")) {
