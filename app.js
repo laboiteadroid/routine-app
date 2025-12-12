@@ -1,3 +1,4 @@
+alert("APP.JS IS RUNNING");
 /***********************
  * Routine App JS v3.3
  * Compatible avec :
