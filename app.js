@@ -1,17 +1,11 @@
 /***********************
- * Routine App JS v3.5 (Stable)
- * - lastCompletedStep corrigé et totalement fiable
- * - Durée totale fonctionne
- * - Save to history fonctionne
- * - Sauvegarde automatique à chaque étape
- * - Reprise automatique à l'ouverture
- * - Compatible avec ton HTML
+ * Routine App JS v3.7 (Stable + French Time Format)
+ * Compatible avec format "14 h 36"
  ************************/
 
-let steps = Array(11).fill(null);  // steps[1] à steps[10]
+let steps = Array(11).fill(null);  
 let lastCompletedStep = 0;
 
-// Liste des noms des étapes
 const stepNames = [
     "",
     "Start wake-up",
@@ -27,7 +21,7 @@ const stepNames = [
 ];
 
 /***********************
- * Charger les données sauvegardées
+ * Charger données sauvegardées
  ************************/
 window.addEventListener("load", () => {
     const saved = localStorage.getItem("currentRoutine");
@@ -35,8 +29,6 @@ window.addEventListener("load", () => {
     if (saved) {
         steps = JSON.parse(saved);
 
-        // Trouver la dernière étape complétée
-        lastCompletedStep = 0;
         for (let i = 10; i >= 1; i--) {
             if (steps[i] !== null) {
                 lastCompletedStep = i;
@@ -50,20 +42,46 @@ window.addEventListener("load", () => {
 });
 
 /***********************
+ * Convertir "14 h 36" → { hour: 14, minute: 36 }
+ ************************/
+function parseFrenchTime(t) {
+    if (!t) return null;
+
+    // Format: "14 h 36" (français)
+    if (t.includes("h")) {
+        const parts = t.split("h");
+        const h = parseInt(parts[0].trim());
+        const m = parseInt(parts[1].trim());
+        return { hour: h, minute: m };
+    }
+
+    // Format "14:36" fallback
+    if (t.includes(":")) {
+        const [h, m] = t.split(":").map(Number);
+        return { hour: h, minute: m };
+    }
+
+    return null;
+}
+
+/***********************
  * Enregistrer l'heure d'une étape
  ************************/
 function recordTime(stepNumber) {
     const now = new Date();
-    const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    steps[stepNumber] = timeString;
+    const formatted = now.toLocaleTimeString("fr-CA", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+    }).replace(":", " h ");
 
-    // Mise à jour lastCompletedStep
+    steps[stepNumber] = formatted;
+
     if (stepNumber > lastCompletedStep) {
         lastCompletedStep = stepNumber;
     }
 
-    // Sauvegarde automatique
     localStorage.setItem("currentRoutine", JSON.stringify(steps));
 
     updateUI();
@@ -71,24 +89,7 @@ function recordTime(stepNumber) {
 }
 
 /***********************
- * Mettre à jour "Current step"
- ************************/
-function updateCurrentStep() {
-    const el = document.getElementById("focusStep");
-
-    if (lastCompletedStep === 0) {
-        el.textContent = stepNames[1];
-        return;
-    }
-
-    let nextStep = lastCompletedStep + 1;
-    if (nextStep > 10) nextStep = 10;
-
-    el.textContent = stepNames[nextStep];
-}
-
-/***********************
- * Met à jour l'affichage des heures dans l'écran Routine
+ * Mettre à jour l'affichage
  ************************/
 function updateUI() {
     for (let i = 1; i <= 10; i++) {
@@ -99,31 +100,44 @@ function updateUI() {
     }
 }
 
+function updateCurrentStep() {
+    const el = document.getElementById("focusStep");
+
+    if (lastCompletedStep === 0) {
+        el.textContent = stepNames[1];
+        return;
+    }
+
+    let next = lastCompletedStep + 1;
+    if (next > 10) next = 10;
+
+    el.textContent = stepNames[next];
+}
+
 /***********************
  * Calcul de la durée totale
  ************************/
 function calculateDuration() {
-    const first = steps[1];
-    const last = steps[lastCompletedStep];
+    const first = parseFrenchTime(steps[1]);
+    const last = parseFrenchTime(steps[lastCompletedStep]);
 
     if (!first || !last) return null;
 
-    const [fh, fm] = first.split(":").map(Number);
-    const [lh, lm] = last.split(":").map(Number);
+    const start = new Date();
+    start.setHours(first.hour, first.minute, 0);
 
-    const start = new Date(); start.setHours(fh, fm, 0);
-    const end = new Date(); end.setHours(lh, lm, 0);
+    const end = new Date();
+    end.setHours(last.hour, last.minute, 0);
 
     const diffMs = end - start;
-
     const diffMin = Math.floor(diffMs / 60000);
     const diffSec = Math.floor((diffMs % 60000) / 1000);
 
-    return { first, last, diffMin, diffSec };
+    return { first: steps[1], last: steps[lastCompletedStep], diffMin, diffSec };
 }
 
 /***********************
- * Afficher la durée totale (popup)
+ * Afficher durée totale
  ************************/
 function showTotalDuration() {
     const d = calculateDuration();
@@ -141,7 +155,7 @@ function showTotalDuration() {
 }
 
 /***********************
- * Enregistrer la routine dans l'historique
+ * Sauvegarder dans l'historique
  ************************/
 function saveToHistory() {
     const d = calculateDuration();
@@ -151,19 +165,22 @@ function saveToHistory() {
         return;
     }
 
-    // Créer les breakdowns
     let breakdown = [];
 
     for (let i = 2; i <= lastCompletedStep; i++) {
-        if (steps[i - 1] && steps[i]) {
-            const [h1, m1] = steps[i - 1].split(":").map(Number);
-            const [h2, m2] = steps[i].split(":").map(Number);
+        const t1 = parseFrenchTime(steps[i - 1]);
+        const t2 = parseFrenchTime(steps[i]);
 
-            const t1 = new Date(); t1.setHours(h1, m1, 0);
-            const t2 = new Date(); t2.setHours(h2, m2, 0);
+        if (t1 && t2) {
+            const start = new Date();
+            start.setHours(t1.hour, t1.minute, 0);
 
-            const dm = Math.floor((t2 - t1) / 60000);
-            const ds = Math.floor(((t2 - t1) % 60000) / 1000);
+            const end = new Date();
+            end.setHours(t2.hour, t2.minute, 0);
+
+            const diffMs = end - start;
+            const dm = Math.floor(diffMs / 60000);
+            const ds = Math.floor((diffMs % 60000) / 1000);
 
             breakdown.push(`${stepNames[i - 1]} → ${stepNames[i]} : ${dm}m${ds}s`);
         }
@@ -177,15 +194,14 @@ function saveToHistory() {
         breakdown
     };
 
-    // Sauvegarder dans localStorage
     let history = JSON.parse(localStorage.getItem("history") || "[]");
     history.push(entry);
     localStorage.setItem("history", JSON.stringify(history));
 
-    // Réinitialisation de la routine
-    localStorage.removeItem("currentRoutine");
+    // Reset routine
     steps = Array(11).fill(null);
     lastCompletedStep = 0;
+    localStorage.removeItem("currentRoutine");
 
     updateUI();
     updateCurrentStep();
@@ -194,14 +210,13 @@ function saveToHistory() {
 }
 
 /***********************
- * Charger l'historique dans la page History
+ * Charger History
  ************************/
 function loadHistory() {
     const container = document.getElementById("history");
     if (!container) return;
 
     let history = JSON.parse(localStorage.getItem("history") || "[]");
-
     container.innerHTML = "";
 
     history.forEach(item => {
@@ -221,9 +236,6 @@ function loadHistory() {
     });
 }
 
-/***********************
- * Effacer l'historique
- ************************/
 function clearHistory() {
     if (confirm("Clear ALL history?")) {
         localStorage.removeItem("history");
