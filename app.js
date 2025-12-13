@@ -103,14 +103,20 @@ function updateUI() {
 function updateCurrentStep() {
     const el = document.getElementById("focusStep");
 
+    // Pas encore commencé
     if (lastCompletedStep === 0) {
         el.textContent = stepNames[1];
         return;
     }
 
-    let next = lastCompletedStep + 1;
-    if (next > 10) next = 10;
+    // Routine terminée
+    if (lastCompletedStep === 10) {
+        el.textContent = "Routine finished";
+        return;
+    }
 
+    // Routine en progression
+    let next = lastCompletedStep + 1;
     el.textContent = stepNames[next];
 }
 
@@ -161,9 +167,9 @@ function saveToHistory() {
     const d = calculateDuration();
 
     if (!d) {
-        alert("Not enough steps recorded.");
-        return;
-    }
+    alert("Record at least the first and last steps before saving.");
+    return;
+}
 
     let breakdown = [];
 
