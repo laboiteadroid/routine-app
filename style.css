@@ -144,3 +144,45 @@ button:hover {
         margin: 12mm;
     }
 }
+/*************************************************
+ * PRINT MODE – Compact history (A4)
+ *************************************************/
+@media print {
+
+  /* Page setup */
+  @page {
+    size: A4;
+    margin: 8mm;
+  }
+
+  body {
+    font-size: 10px;
+    line-height: 1.25;
+    background: white;
+  }
+
+  header,
+  nav,
+  button {
+    display: none !important;
+  }
+
+  /* History entries */
+  .history-entry {
+    margin-bottom: 6px;
+    padding-bottom: 6px;
+  }
+
+  .history-entry strong {
+    font-weight: 600;
+  }
+
+  .history-entry hr {
+    margin: 4px 0;
+  }
+
+  /* Step breakdown spacing */
+  .history-entry br {
+    line-height: 1.15;
+  }
+    }
