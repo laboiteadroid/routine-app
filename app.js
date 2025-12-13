@@ -1,3 +1,11 @@
+// 🔒 Anti-blocage Chrome mobile
+const routineExists = localStorage.getItem("currentRoutine");
+const routineSaved = localStorage.getItem("routineSaved");
+
+if (!routineExists && routineSaved) {
+    localStorage.removeItem("routineSaved");
+}
+
 /***********************
  * Routine App JS – Version finale stable
  ************************/
