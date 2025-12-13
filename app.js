@@ -39,6 +39,9 @@ window.addEventListener("load", () => {
 
     updateUI();
     updateCurrentStep();
+
+    // 👉 NOUVEAU : restaurer les durées (delta) après rechargement
+    restoreDeltas();
 });
 
 /***********************
