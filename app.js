@@ -291,3 +291,33 @@ function clearHistory() {
         loadHistory();
     }
 }
+// ... autres fonctions (recordTime, updateUI, etc.)
+
+/***********************
+ * Restaurer les durées (delta) après rechargement
+ ************************/
+function restoreDeltas() {
+    for (let i = 2; i <= 10; i++) {
+        if (steps[i] && steps[i - 1]) {
+            const t1 = parseFrenchTime(steps[i - 1]);
+            const t2 = parseFrenchTime(steps[i]);
+
+            if (t1 && t2) {
+                const start = new Date();
+                start.setHours(t1.hour, t1.minute, 0);
+
+                const end = new Date();
+                end.setHours(t2.hour, t2.minute, 0);
+
+                const diffMs = end - start;
+                const dm = Math.floor(diffMs / 60000);
+                const ds = Math.floor((diffMs % 60000) / 1000);
+
+                const deltaEl = document.getElementById(`delta-${i}`);
+                if (deltaEl) {
+                    deltaEl.textContent = `${dm}m ${ds}s`;
+                }
+            }
+        }
+    }
+}
