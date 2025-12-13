@@ -124,22 +124,38 @@ function updateCurrentStep() {
  * Calcul de la durée totale
  ************************/
 function calculateDuration() {
-    const first = parseFrenchTime(steps[1]);
-    const last = parseFrenchTime(steps[lastCompletedStep]);
+    const firstIndex = steps.findIndex(s => s !== null);
+    const lastIndex = steps.length - 1 - [...steps].reverse().findIndex(s => s !== null);
 
-    if (!first || !last) return null;
+    if (firstIndex === -1 || lastIndex === -1 || firstIndex === lastIndex) {
+        return null;
+    }
+
+    const t1 = parseFrenchTime(steps[firstIndex]);
+    const t2 = parseFrenchTime(steps[lastIndex]);
+
+    if (!t1 || !t2) return null;
 
     const start = new Date();
-    start.setHours(first.hour, first.minute, 0);
+    start.setHours(t1.hour, t1.minute, 0, 0);
 
     const end = new Date();
-    end.setHours(last.hour, last.minute, 0);
+    end.setHours(t2.hour, t2.minute, 0, 0);
 
-    const diffMs = end - start;
+    let diffMs = end - start;
+    if (diffMs < 0) diffMs += 24 * 60 * 60 * 1000; // sécurité jour suivant
+
     const diffMin = Math.floor(diffMs / 60000);
     const diffSec = Math.floor((diffMs % 60000) / 1000);
 
-    return { first: steps[1], last: steps[lastCompletedStep], diffMin, diffSec };
+    return {
+        first: steps[firstIndex],
+        last: steps[lastIndex],
+        diffMin,
+        diffSec,
+        firstIndex,
+        lastIndex
+    };
 }
 
 /***********************
