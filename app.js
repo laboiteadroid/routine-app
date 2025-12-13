@@ -112,9 +112,15 @@ if (stepNumber > 1 && steps[stepNumber - 1]) {
 
     // 👉 NOUVEAU : détecter la fin de routine
     if (stepNumber === 10) {
-        updateCurrentStep("Routine completed");
-    } else {
-        updateCurrentStep();
+    updateCurrentStep("Routine completed");
+
+    // 🔒 éviter double sauvegarde
+    if (!localStorage.getItem("routineSaved")) {
+        saveToHistory();
+        localStorage.setItem("routineSaved", "true");
+    }
+} else {
+    updateCurrentStep();
     }
 }
 
