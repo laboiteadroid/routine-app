@@ -207,13 +207,18 @@ function saveToHistory() {
     localStorage.removeItem("routineSaved");
 
     updateUI();
-    updateCurrentStep();
 
-    // Effacer les deltas
-    for (let i = 2; i <= 10; i++) {
-        const d = document.getElementById(`delta-${i}`);
-        if (d) d.textContent = "";
-    }
+// 🔁 Forcer l'état initial visuel
+const focus = document.getElementById("focusStep");
+if (focus) {
+    focus.textContent = stepNames[1]; // Start wake-up
+}
+
+// Effacer les deltas
+for (let i = 2; i <= 10; i++) {
+    const d = document.getElementById(`delta-${i}`);
+    if (d) d.textContent = "";
+}
 }
 
 /***********************
