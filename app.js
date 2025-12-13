@@ -248,3 +248,6 @@ function clearHistory() {
         loadHistory();
     }
 }
+document.addEventListener("DOMContentLoaded", () => {
+    loadHistory();
+});
