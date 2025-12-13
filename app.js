@@ -1,6 +1,5 @@
-
 /***********************
- * Routine App JS v3.8 (Auto-save + restore deltas)
+ * Routine App JS – Version finale stable
  ************************/
 
 let steps = Array(11).fill(null);
@@ -21,7 +20,7 @@ const stepNames = [
 ];
 
 /***********************
- * Charger données sauvegardées
+ * Chargement initial
  ************************/
 window.addEventListener("load", () => {
     const saved = localStorage.getItem("currentRoutine");
@@ -43,13 +42,13 @@ window.addEventListener("load", () => {
 });
 
 /***********************
- * Convertir "14 h 36"
+ * Parse heure FR "14 h 36"
  ************************/
 function parseFrenchTime(t) {
     if (!t) return null;
 
     if (t.includes("h")) {
-        const [h, m] = t.split("h").map(s => parseInt(s.trim()));
+        const [h, m] = t.split("h").map(v => parseInt(v.trim()));
         return { hour: h, minute: m };
     }
 
@@ -74,7 +73,7 @@ function recordTime(stepNumber) {
 
     steps[stepNumber] = formatted;
 
-    // Calcul durée précédente
+    // Calcul durée de l'étape précédente
     if (stepNumber > 1 && steps[stepNumber - 1]) {
         const t1 = parseFrenchTime(steps[stepNumber - 1]);
         const t2 = parseFrenchTime(formatted);
@@ -82,6 +81,7 @@ function recordTime(stepNumber) {
         if (t1 && t2) {
             const start = new Date();
             start.setHours(t1.hour, t1.minute, 0);
+
             const end = new Date();
             end.setHours(t2.hour, t2.minute, 0);
 
@@ -103,7 +103,7 @@ function recordTime(stepNumber) {
     updateUI();
     updateCurrentStep();
 
-    // ✅ FIN DE ROUTINE → sauvegarde automatique
+    // FIN DE ROUTINE → sauvegarde automatique
     if (stepNumber === 10 && !localStorage.getItem("routineSaved")) {
         saveToHistory();
         localStorage.setItem("routineSaved", "true");
@@ -111,7 +111,7 @@ function recordTime(stepNumber) {
 }
 
 /***********************
- * UI
+ * Mise à jour UI
  ************************/
 function updateUI() {
     for (let i = 1; i <= 10; i++) {
@@ -163,7 +163,7 @@ function calculateDuration() {
 }
 
 /***********************
- * Sauvegarde historique
+ * Sauvegarde historique + RESET
  ************************/
 function saveToHistory() {
     const d = calculateDuration();
@@ -178,6 +178,7 @@ function saveToHistory() {
 
             const start = new Date();
             start.setHours(t1.hour, t1.minute, 0);
+
             const end = new Date();
             end.setHours(t2.hour, t2.minute, 0);
 
@@ -199,7 +200,7 @@ function saveToHistory() {
 
     localStorage.setItem("history", JSON.stringify(history));
 
-    // RESET
+    // RESET COMPLET
     steps = Array(11).fill(null);
     lastCompletedStep = 0;
     localStorage.removeItem("currentRoutine");
@@ -207,10 +208,16 @@ function saveToHistory() {
 
     updateUI();
     updateCurrentStep();
+
+    // Effacer les deltas
+    for (let i = 2; i <= 10; i++) {
+        const d = document.getElementById(`delta-${i}`);
+        if (d) d.textContent = "";
+    }
 }
 
 /***********************
- * Restaurer deltas
+ * Restaurer les durées (delta)
  ************************/
 function restoreDeltas() {
     for (let i = 2; i <= 10; i++) {
@@ -220,13 +227,15 @@ function restoreDeltas() {
 
             const start = new Date();
             start.setHours(t1.hour, t1.minute, 0);
+
             const end = new Date();
             end.setHours(t2.hour, t2.minute, 0);
 
             const diffMs = end - start;
             const deltaEl = document.getElementById(`delta-${i}`);
             if (deltaEl) {
-                deltaEl.textContent = `${Math.floor(diffMs / 60000)}m ${Math.floor((diffMs % 60000) / 1000)}s`;
+                deltaEl.textContent =
+                    `${Math.floor(diffMs / 60000)}m ${Math.floor((diffMs % 60000) / 1000)}s`;
             }
         }
     }
