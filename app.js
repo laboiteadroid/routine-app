@@ -85,7 +85,13 @@ function recordTime(stepNumber) {
     localStorage.setItem("currentRoutine", JSON.stringify(steps));
 
     updateUI();
-    updateCurrentStep();
+
+    // 👉 NOUVEAU : détecter la fin de routine
+    if (stepNumber === 10) {
+        updateCurrentStep("Routine completed");
+    } else {
+        updateCurrentStep();
+    }
 }
 
 /***********************
