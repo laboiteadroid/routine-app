@@ -267,3 +267,6 @@ function clearHistory() {
 document.addEventListener("DOMContentLoaded", () => {
     loadHistory();
 });
+document.addEventListener("DOMContentLoaded", () => {
+    loadHistory();
+});
