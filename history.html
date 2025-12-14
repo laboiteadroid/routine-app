@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,50 +8,45 @@
 
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
+
     <style>
-@media print {
+    @media print {
 
-  body {
-    font-size: 9px;
-    line-height: 1.15;
-    margin: 8mm;
-  }
+      body {
+        font-size: 9px;
+        line-height: 1.15;
+        margin: 8mm;
+      }
 
-  header, nav, button {
-    display: none !important;
-  }
+      header, nav, button {
+        display: none !important;
+      }
 
-  /* 🔴 Indicateur visuel */
-  body::before {
-    content: "PRINT MODE ACTIVE";
-    display: block;
-    color: red;
-    font-weight: bold;
-    margin-bottom: 6px;
-  }
+      body::before {
+        content: "PRINT MODE ACTIVE";
+        display: block;
+        color: red;
+        font-weight: bold;
+        margin-bottom: 6px;
+      }
 
-  /* ✅ 2 colonnes */
-  #history {
-    column-count: 2;
-    column-gap: 10mm;
-  }
+      #history {
+        column-count: 2;
+        column-gap: 10mm;
+      }
 
-  .history-entry {
-    break-inside: avoid;
-    margin-bottom: 6px;
-    padding-bottom: 4px;
-    border-bottom: 1px solid #ccc;
-  }
+      .history-entry {
+        break-inside: avoid;
+        margin-bottom: 6px;
+        padding-bottom: 4px;
+        border-bottom: 1px solid #ccc;
+      }
 
-  .history-entry strong {
-    font-size: 9px;
-  }
-
-  hr {
-    margin: 4px 0;
-  }
-}
-</style>
+      hr {
+        margin: 4px 0;
+      }
+    }
+    </style>
 </head>
 
 <body>
@@ -60,40 +56,10 @@
         <a href="index.html">Routine</a>
         <a href="history.html" class="active">History</a>
     </nav>
-    <style>
-@media print {
-
-  body {
-    font-size: 9px;
-    line-height: 1.15;
-    margin: 8mm;
-  }
-
-  header, nav, button {
-    display: none !important;
-  }
-
-  .history-entry {
-    page-break-inside: avoid;
-    margin-bottom: 6px;
-    padding-bottom: 4px;
-    border-bottom: 1px solid #ccc;
-  }
-
-  .history-entry strong {
-    font-size: 9px;
-  }
-
-  hr {
-    margin: 4px 0;
-  }
-}
-    </style>
 </header>
 
 <h2>Routine History</h2>
 
-<!-- NEW BUTTONS -->
 <div style="margin-left: 15px;">
     <button onclick="window.print()">Print history</button>
     <button onclick="clearHistory()">Clear history</button>
@@ -101,45 +67,13 @@
 
 <div id="history"></div>
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-    const history = JSON.parse(localStorage.getItem("routine_history") || "[]");
-    const container = document.getElementById("historyList");
-
-    if (history.length === 0) {
-        container.innerHTML = "<p style='margin:15px;'>No history yet.</p>";
-        return;
-    }
-
-    history.forEach(entry => {
-        const div = document.createElement("div");
-        div.className = "history-entry";
-
-        div.innerHTML = `
-            <strong>${entry.date}</strong>
-            <div class="muted">Start: ${entry.start}</div>
-            <div class="muted">End: ${entry.end}</div>
-            <div class="muted">Duration: ${entry.duration}</div>
-            <hr>
-            <div><strong>Step breakdown:</strong></div>
-            ${entry.breakdown.map(b => `<div class="muted">${b}</div>`).join("")}
-        `;
-
-        container.appendChild(div);
-    });
-});
-
-// NEW FUNCTION
-function clearHistory() {
-    if (confirm("Are you sure you want to delete ALL history?")) {
-        localStorage.removeItem("routine_history");
-        location.reload();
-    }
-}
-</script>
+<!-- Logique principale -->
 <script src="app.js"></script>
+
+<!-- Charger l'historique -->
 <script>
   loadHistory();
 </script>
+
 </body>
 </html>
