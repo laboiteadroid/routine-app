@@ -104,61 +104,13 @@ button:hover {
     color: #444;
     margin-left: 10px;
 }
-/* PRINT MODE — compact, ink-friendly */
-@media print {
-
-    /* Remove navigation bar, buttons, background color */
-    nav, button, h2 {
-        display: none !important;
-    }
-
-    body {
-        background: white !important;
-    }
-
-    /* Compact history entries */
-    .history-entry {
-        border: 1px solid #aaa;
-        padding: 6px 8px;
-        margin: 6px 0;
-        border-radius: 0;
-        background: white;
-        page-break-inside: avoid;
-    }
-
-    /* Smaller text so more days fit per page */
-    .history-entry strong {
-        font-size: 14px;
-    }
-
-    .muted {
-        font-size: 12px;
-    }
-
-    hr {
-        margin: 4px 0;
-    }
-
-    /* Reduced margins on printed page */
-    @page {
-        margin: 12mm;
-    }
 }
-/*************************************************
- * PRINT MODE – Compact history (A4)
- *************************************************/
 @media print {
-
-  /* Page setup */
-  @page {
-    size: A4;
-    margin: 8mm;
-  }
 
   body {
-    font-size: 10px;
-    line-height: 1.25;
-    background: white;
+    font-size: 9px;
+    line-height: 1.15;
+    margin: 8mm;
   }
 
   header,
@@ -167,33 +119,20 @@ button:hover {
     display: none !important;
   }
 
-  /* History entries */
+  /* 2 colonnes pour maximiser la page */
+  #history {
+    column-count: 2;
+    column-gap: 10mm;
+  }
+
   .history-entry {
+    break-inside: avoid;
     margin-bottom: 6px;
-    padding-bottom: 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #ccc;
   }
 
-  .history-entry strong {
-    font-weight: 600;
-  }
-
-  .history-entry hr {
+  hr {
     margin: 4px 0;
-  }
-
-  /* Step breakdown spacing */
-  .history-entry br {
-    line-height: 1.15;
-  }
-    }
-@media print {
-  body::before {
-    content: "PRINT MODE ACTIVE";
-    position: fixed;
-    top: 0;
-    left: 0;
-    font-size: 40px;
-    color: red;
-    z-index: 9999;
   }
 }
