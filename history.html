@@ -20,8 +20,23 @@
     display: none !important;
   }
 
+  /* 🔴 Indicateur visuel */
+  body::before {
+    content: "PRINT MODE ACTIVE";
+    display: block;
+    color: red;
+    font-weight: bold;
+    margin-bottom: 6px;
+  }
+
+  /* ✅ 2 colonnes */
+  #history {
+    column-count: 2;
+    column-gap: 10mm;
+  }
+
   .history-entry {
-    page-break-inside: avoid;
+    break-inside: avoid;
     margin-bottom: 6px;
     padding-bottom: 4px;
     border-bottom: 1px solid #ccc;
@@ -35,7 +50,7 @@
     margin: 4px 0;
   }
 }
-    </style>
+</style>
 </head>
 
 <body>
