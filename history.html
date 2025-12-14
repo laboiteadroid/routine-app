@@ -16,6 +16,35 @@
         <a href="index.html">Routine</a>
         <a href="history.html" class="active">History</a>
     </nav>
+    <style>
+@media print {
+
+  body {
+    font-size: 9px;
+    line-height: 1.15;
+    margin: 8mm;
+  }
+
+  header, nav, button {
+    display: none !important;
+  }
+
+  .history-entry {
+    page-break-inside: avoid;
+    margin-bottom: 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .history-entry strong {
+    font-size: 9px;
+  }
+
+  hr {
+    margin: 4px 0;
+  }
+}
+    </style>
 </header>
 
 <h2>Routine History</h2>
