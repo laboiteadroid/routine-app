@@ -186,3 +186,14 @@ button:hover {
     line-height: 1.15;
   }
     }
+@media print {
+  body::before {
+    content: "PRINT MODE ACTIVE";
+    position: fixed;
+    top: 0;
+    left: 0;
+    font-size: 40px;
+    color: red;
+    z-index: 9999;
+  }
+}
