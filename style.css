@@ -136,3 +136,28 @@ button:hover {
     margin: 4px 0;
   }
 }
+/* ===== Routine step states ===== */
+
+.step {
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: background-color 0.2s ease;
+}
+
+/* Étape complétée */
+.step.done {
+    background-color: #f0f0f0; /* gris très pâle */
+    color: #666;
+}
+
+/* Étape active (prochaine à cliquer) */
+.step.active {
+    background-color: #e6f4ea; /* vert très doux */
+    border: 1px solid #b7dfc3;
+}
+
+/* Empêcher clic visuel sur les étapes futures */
+.step.future {
+    opacity: 0.9;
+}
