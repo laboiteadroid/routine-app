@@ -71,9 +71,16 @@ function nowFormatted() {
  ************************/
 function recordTime(stepNumber) {
 
-    // 🛡️ PROTECTION : seule la prochaine étape est autorisée
+    // 🚫 Étape déjà enregistrée → bloquée définitivement
+    if (steps[stepNumber] !== null) {
+        alert("This step is already recorded.");
+        return;
+    }
+
+    // 🚫 Empêcher de sauter ou répéter des étapes
     if (stepNumber !== lastCompletedStep + 1) {
-        return; // clic ignoré silencieusement
+        alert("Please complete the steps in order.");
+        return;
     }
 
     const now = new Date();
@@ -116,7 +123,7 @@ function recordTime(stepNumber) {
 
     updateUI();
 
-    // 🏁 FIN DE ROUTINE → sauvegarde auto
+    // 🏁 FIN DE ROUTINE → sauvegarde auto + reset
     if (stepNumber === 10) {
         updateCurrentStep("Routine finished");
 
