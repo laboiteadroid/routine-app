@@ -144,18 +144,13 @@ function recordTime(stepNumber) {
 
     updateUI();
 
-    // 🏁 FIN DE ROUTINE → sauvegarde auto + reset
-    if (stepNumber === 10) {
-
-    if (!localStorage.getItem("routineSaved")) {
-        saveToHistory();
-        localStorage.setItem("routineSaved", "true");
-    }
-
-    updateCurrentStep();
-} else {
-    updateCurrentStep();
+    // 🏁 FIN DE ROUTINE → sauvegarde auto
+if (stepNumber === 10 && !localStorage.getItem("routineSaved")) {
+    saveToHistory();
+    localStorage.setItem("routineSaved", "true");
 }
+
+updateCurrentStep();
 }
 
 /***********************
