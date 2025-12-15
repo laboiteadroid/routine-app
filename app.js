@@ -1,11 +1,14 @@
 /***********************
- * Routine App JS v3.9 FINAL STABLE
- * Android Chrome compatible
+ * Routine App JS v4.0 FINAL OFFICIELLE
+ * Android Chrome / PWA SAFE
  ************************/
 
 let steps = Array(11).fill(null);
 let lastCompletedStep = 0;
 
+/***********************
+ * Noms des étapes
+ ************************/
 const stepNames = [
     "",
     "Start wake-up",
@@ -28,7 +31,7 @@ if (!localStorage.getItem("currentRoutine")) {
 }
 
 /***********************
- * Charger données sauvegardées
+ * Chargement initial
  ************************/
 window.addEventListener("load", () => {
     const saved = localStorage.getItem("currentRoutine");
@@ -46,6 +49,7 @@ window.addEventListener("load", () => {
     updateUI();
     updateCurrentStep();
     restoreDeltas();
+    checkAutoSave(); // 🛡️ sécurité post-refresh
 });
 
 /***********************
@@ -64,146 +68,84 @@ function nowFormatted() {
         hour12: false
     }).replace(":", " h ");
 }
+
 /***********************
- * Mise à jour étape courante (texte)
+ * Texte étape courante
  ************************/
 function updateCurrentStep() {
     const el = document.getElementById("focusStep");
     if (!el) return;
 
-    // Pas encore commencé
     if (lastCompletedStep === 0) {
         el.textContent = stepNames[1];
         return;
     }
 
-    // Routine terminée
     if (lastCompletedStep === 10) {
         el.textContent = "Routine finished";
         return;
     }
 
-    // Étape suivante attendue
     el.textContent = stepNames[lastCompletedStep + 1];
 }
+
 /***********************
- * Enregistrer l'heure d'une étape
- * + Protection anti-double-clic
+ * ENREGISTRER UNE ÉTAPE
+ * + protection anti-double-clic
  ************************/
 function recordTime(stepNumber) {
 
-    // 🚫 Étape déjà enregistrée → bloquée définitivement
-    if (steps[stepNumber] !== null) {
-        alert("This step is already recorded.");
-        return;
-    }
+    // 🚫 Étape déjà enregistrée
+    if (steps[stepNumber] !== null) return;
 
-    // 🚫 Empêcher de sauter ou répéter des étapes
-    if (stepNumber !== lastCompletedStep + 1) {
-        alert("Please complete the steps in order.");
-        return;
-    }
+    // 🚫 Respect de l'ordre strict
+    if (stepNumber !== lastCompletedStep + 1) return;
 
-    const now = new Date();
-
-    const formatted = now.toLocaleTimeString("fr-CA", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false
-    }).replace(":", " h ");
-
+    const formatted = nowFormatted();
     steps[stepNumber] = formatted;
 
-    // ➕ Calcul de la durée de l'étape précédente
+    // ⏱️ Calcul durée étape précédente
     if (stepNumber > 1 && steps[stepNumber - 1]) {
         const t1 = parseFrenchTime(steps[stepNumber - 1]);
         const t2 = parseFrenchTime(steps[stepNumber]);
 
         if (t1 && t2) {
-            const start = new Date();
-            start.setHours(t1.hour, t1.minute, 0);
+            const s = new Date();
+            const e = new Date();
+            s.setHours(t1.hour, t1.minute, 0);
+            e.setHours(t2.hour, t2.minute, 0);
 
-            const end = new Date();
-            end.setHours(t2.hour, t2.minute, 0);
+            const diff = e - s;
+            const m = Math.floor(diff / 60000);
+            const sec = Math.floor((diff % 60000) / 1000);
 
-            const diffMs = end - start;
-            const dm = Math.floor(diffMs / 60000);
-            const ds = Math.floor((diffMs % 60000) / 1000);
-
-            const deltaEl = document.getElementById(`delta-${stepNumber}`);
-            if (deltaEl) {
-                deltaEl.textContent = `${dm}m ${ds}s`;
-            }
+            const el = document.getElementById(`delta-${stepNumber}`);
+            if (el) el.textContent = `${m}m ${sec}s`;
         }
     }
 
     lastCompletedStep = stepNumber;
 
-    // 💾 Sauvegarde immédiate (anti-crash)
+    // 💾 Anti-crash immédiat
     localStorage.setItem("currentRoutine", JSON.stringify(steps));
 
     updateUI();
-
-    // 🏁 FIN DE ROUTINE → sauvegarde auto
-if (stepNumber === 10 && !localStorage.getItem("routineSaved")) {
-    saveToHistory();
-    localStorage.setItem("routineSaved", "true");
-}
-
-updateCurrentStep();
+    updateCurrentStep();
+    checkAutoSave(); // ⭐ clé de la v4.0
 }
 
 /***********************
- * Calcul durée étape
+ * SAUVEGARDE AUTO ROBUSTE
  ************************/
-function calculateDelta(step) {
-    if (step <= 1 || !steps[step - 1]) return;
-
-    const a = parseFrenchTime(steps[step - 1]);
-    const b = parseFrenchTime(steps[step]);
-
-    const s = new Date();
-    const e = new Date();
-    s.setHours(a.hour, a.minute, 0);
-    e.setHours(b.hour, b.minute, 0);
-
-    const diff = e - s;
-    const m = Math.floor(diff / 60000);
-    const sec = Math.floor((diff % 60000) / 1000);
-
-    const el = document.getElementById(`delta-${step}`);
-    if (el) el.textContent = `${m}m ${sec}s`;
-}
-
-function updateUI() {
-    for (let i = 1; i <= 10; i++) {
-        const timeEl = document.getElementById(`time-${i}`);
-        const stepEl = timeEl ? timeEl.closest(".step") : null;
-
-        if (timeEl) {
-            timeEl.textContent = steps[i] ? steps[i] : "--:--";
-        }
-
-        if (!stepEl) continue;
-
-        // Nettoyage des états
-        stepEl.classList.remove("done", "active", "future");
-
-        if (steps[i]) {
-            // Étape terminée
-            stepEl.classList.add("done");
-        } else if (i === lastCompletedStep + 1) {
-            // Étape active
-            stepEl.classList.add("active");
-        } else if (i > lastCompletedStep + 1) {
-            // Étapes futures
-            stepEl.classList.add("future");
-        }
+function checkAutoSave() {
+    if (lastCompletedStep === 10 && !localStorage.getItem("routineSaved")) {
+        localStorage.setItem("routineSaved", "true");
+        saveToHistory();
     }
 }
 
 /***********************
- * Durée totale
+ * Calcul durée totale
  ************************/
 function calculateDuration() {
     const first = steps.find(s => s);
@@ -228,10 +170,30 @@ function calculateDuration() {
     };
 }
 
-function showTotalDuration() {
-    const d = calculateDuration();
-    if (!d) return alert("Not enough steps.");
-    alert(`Total: ${d.min}m ${d.sec}s\nStart: ${d.start}\nEnd: ${d.end}`);
+/***********************
+ * UI états visuels
+ ************************/
+function updateUI() {
+    for (let i = 1; i <= 10; i++) {
+        const timeEl = document.getElementById(`time-${i}`);
+        const stepEl = timeEl?.closest(".step");
+
+        if (timeEl) {
+            timeEl.textContent = steps[i] || "--:--";
+        }
+
+        if (!stepEl) continue;
+
+        stepEl.classList.remove("done", "active", "future");
+
+        if (steps[i]) {
+            stepEl.classList.add("done");
+        } else if (i === lastCompletedStep + 1) {
+            stepEl.classList.add("active");
+        } else {
+            stepEl.classList.add("future");
+        }
+    }
 }
 
 /***********************
@@ -243,13 +205,12 @@ function saveToHistory() {
 
     const breakdown = [];
     for (let i = 2; i <= lastCompletedStep; i++) {
-        if (steps[i] && steps[i - 1]) {
-            const el = document.getElementById(`delta-${i}`);
-            breakdown.push(`${stepNames[i - 1]} → ${stepNames[i]} : ${el?.textContent || ""}`);
-        }
+        const el = document.getElementById(`delta-${i}`);
+        breakdown.push(`${stepNames[i - 1]} → ${stepNames[i]} : ${el?.textContent || ""}`);
     }
 
     const history = JSON.parse(localStorage.getItem("history") || "[]");
+
     history.push({
         date: new Date().toLocaleDateString(),
         start: d.start,
@@ -263,7 +224,7 @@ function saveToHistory() {
 }
 
 /***********************
- * Reset propre
+ * RESET COMPLET PROPRE
  ************************/
 function resetRoutine() {
     steps = Array(11).fill(null);
@@ -282,16 +243,31 @@ function resetRoutine() {
 }
 
 /***********************
- * Restore deltas
+ * Restaurer durées
  ************************/
 function restoreDeltas() {
     for (let i = 2; i <= 10; i++) {
-        if (steps[i] && steps[i - 1]) calculateDelta(i);
+        if (steps[i] && steps[i - 1]) {
+            const a = parseFrenchTime(steps[i - 1]);
+            const b = parseFrenchTime(steps[i]);
+
+            const s = new Date();
+            const e = new Date();
+            s.setHours(a.hour, a.minute, 0);
+            e.setHours(b.hour, b.minute, 0);
+
+            const diff = e - s;
+            const m = Math.floor(diff / 60000);
+            const sec = Math.floor((diff % 60000) / 1000);
+
+            const el = document.getElementById(`delta-${i}`);
+            if (el) el.textContent = `${m}m ${sec}s`;
+        }
     }
 }
 
 /***********************
- * History page
+ * Page History
  ************************/
 function loadHistory() {
     const container = document.getElementById("history");
