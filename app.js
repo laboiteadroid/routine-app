@@ -158,21 +158,31 @@ function calculateDelta(step) {
     if (el) el.textContent = `${m}m ${sec}s`;
 }
 
-/***********************
- * UI
- ************************/
 function updateUI() {
     for (let i = 1; i <= 10; i++) {
-        const el = document.getElementById(`time-${i}`);
-        if (el) el.textContent = steps[i] || "--:--";
-    }
-}
+        const timeEl = document.getElementById(`time-${i}`);
+        const stepEl = timeEl ? timeEl.closest(".step") : null;
 
-function updateCurrentStep() {
-    const el = document.getElementById("focusStep");
-    if (lastCompletedStep === 0) el.textContent = stepNames[1];
-    else if (lastCompletedStep === 10) el.textContent = "Routine finished";
-    else el.textContent = stepNames[lastCompletedStep + 1];
+        if (timeEl) {
+            timeEl.textContent = steps[i] ? steps[i] : "--:--";
+        }
+
+        if (!stepEl) continue;
+
+        // Nettoyage des états
+        stepEl.classList.remove("done", "active", "future");
+
+        if (steps[i]) {
+            // Étape terminée
+            stepEl.classList.add("done");
+        } else if (i === lastCompletedStep + 1) {
+            // Étape active
+            stepEl.classList.add("active");
+        } else if (i > lastCompletedStep + 1) {
+            // Étapes futures
+            stepEl.classList.add("future");
+        }
+    }
 }
 
 /***********************
