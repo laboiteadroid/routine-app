@@ -66,22 +66,66 @@ function nowFormatted() {
 }
 
 /***********************
- * Enregistrer étape
+ * Enregistrer l'heure d'une étape
+ * + Protection anti-double-clic
  ************************/
-function recordTime(step) {
-    steps[step] = nowFormatted();
+function recordTime(stepNumber) {
 
-    if (step > lastCompletedStep) lastCompletedStep = step;
+    // 🛡️ PROTECTION : seule la prochaine étape est autorisée
+    if (stepNumber !== lastCompletedStep + 1) {
+        return; // clic ignoré silencieusement
+    }
 
+    const now = new Date();
+
+    const formatted = now.toLocaleTimeString("fr-CA", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+    }).replace(":", " h ");
+
+    steps[stepNumber] = formatted;
+
+    // ➕ Calcul de la durée de l'étape précédente
+    if (stepNumber > 1 && steps[stepNumber - 1]) {
+        const t1 = parseFrenchTime(steps[stepNumber - 1]);
+        const t2 = parseFrenchTime(steps[stepNumber]);
+
+        if (t1 && t2) {
+            const start = new Date();
+            start.setHours(t1.hour, t1.minute, 0);
+
+            const end = new Date();
+            end.setHours(t2.hour, t2.minute, 0);
+
+            const diffMs = end - start;
+            const dm = Math.floor(diffMs / 60000);
+            const ds = Math.floor((diffMs % 60000) / 1000);
+
+            const deltaEl = document.getElementById(`delta-${stepNumber}`);
+            if (deltaEl) {
+                deltaEl.textContent = `${dm}m ${ds}s`;
+            }
+        }
+    }
+
+    lastCompletedStep = stepNumber;
+
+    // 💾 Sauvegarde immédiate (anti-crash)
     localStorage.setItem("currentRoutine", JSON.stringify(steps));
 
-    calculateDelta(step);
     updateUI();
-    updateCurrentStep();
 
-    if (step === 10 && !localStorage.getItem("routineSaved")) {
-        saveToHistory();
-        localStorage.setItem("routineSaved", "true");
+    // 🏁 FIN DE ROUTINE → sauvegarde auto
+    if (stepNumber === 10) {
+        updateCurrentStep("Routine finished");
+
+        if (!localStorage.getItem("routineSaved")) {
+            saveToHistory();
+            localStorage.setItem("routineSaved", "true");
+        }
+    } else {
+        updateCurrentStep();
     }
 }
 
