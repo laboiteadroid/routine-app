@@ -64,7 +64,28 @@ function nowFormatted() {
         hour12: false
     }).replace(":", " h ");
 }
+/***********************
+ * Mise à jour étape courante (texte)
+ ************************/
+function updateCurrentStep() {
+    const el = document.getElementById("focusStep");
+    if (!el) return;
 
+    // Pas encore commencé
+    if (lastCompletedStep === 0) {
+        el.textContent = stepNames[1];
+        return;
+    }
+
+    // Routine terminée
+    if (lastCompletedStep === 10) {
+        el.textContent = "Routine finished";
+        return;
+    }
+
+    // Étape suivante attendue
+    el.textContent = stepNames[lastCompletedStep + 1];
+}
 /***********************
  * Enregistrer l'heure d'une étape
  * + Protection anti-double-clic
