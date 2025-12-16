@@ -239,3 +239,21 @@ header nav a:hover {
     color: #2e7d32;        /* vert professionnel */
     font-weight: bold;
 }
+.current-step {
+    text-align: center;
+    margin: 16px 0 20px;
+}
+
+.current-label {
+    font-size: 14px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.current-value {
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 6px;
+    min-height: 1.4em; /* stabilité visuelle */
+}
