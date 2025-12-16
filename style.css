@@ -225,3 +225,17 @@ header nav a.active {
 header nav a:hover {
   background: #dfe3e6;
 }
+.step.done #label-1::before,
+.step.done #label-2::before,
+.step.done #label-3::before,
+.step.done #label-4::before,
+.step.done #label-5::before,
+.step.done #label-6::before,
+.step.done #label-7::before,
+.step.done #label-8::before,
+.step.done #label-9::before,
+.step.done #label-10::before {
+    content: "✔ ";
+    color: #2e7d32;        /* vert professionnel */
+    font-weight: bold;
+}
