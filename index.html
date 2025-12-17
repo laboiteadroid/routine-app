@@ -5,7 +5,7 @@
     <title>Routine App</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Stylesheet -->
+    <!-- Styles -->
     <link rel="stylesheet" href="style.css">
 
     <!-- PWA manifest -->
@@ -21,76 +21,68 @@
     </nav>
 </header>
 
+<!-- CURRENT STEP -->
 <div class="current-step">
     <div class="current-label">Current step</div>
     <div id="focusStep" class="current-value">Start wake-up</div>
 </div>
 
+<!-- STEPS -->
 <div class="step-list">
 
-    <!-- STEP 1 -->
     <div class="step" onclick="recordTime(1)">
         <span id="label-1">Start wake-up</span>
         <span id="time-1" class="time"></span>
     </div>
 
-    <!-- STEP 2 -->
     <div class="step" onclick="recordTime(2)">
         <span id="label-2">Out of bed</span>
         <span id="time-2" class="time"></span>
         <span id="delta-2" class="delta"></span>
     </div>
 
-    <!-- STEP 3 -->
     <div class="step" onclick="recordTime(3)">
         <span id="label-3">In Bathroom</span>
         <span id="time-3" class="time"></span>
         <span id="delta-3" class="delta"></span>
     </div>
 
-    <!-- STEP 4 -->
     <div class="step" onclick="recordTime(4)">
         <span id="label-4">Finished ready</span>
         <span id="time-4" class="time"></span>
         <span id="delta-4" class="delta"></span>
     </div>
 
-    <!-- STEP 5 -->
     <div class="step" onclick="recordTime(5)">
         <span id="label-5">In kitchen</span>
         <span id="time-5" class="time"></span>
         <span id="delta-5" class="delta"></span>
     </div>
 
-    <!-- STEP 6 -->
     <div class="step" onclick="recordTime(6)">
         <span id="label-6">Sitting down for breakfast</span>
         <span id="time-6" class="time"></span>
         <span id="delta-6" class="delta"></span>
     </div>
 
-    <!-- STEP 7 -->
     <div class="step" onclick="recordTime(7)">
         <span id="label-7">Finish eating</span>
         <span id="time-7" class="time"></span>
         <span id="delta-7" class="delta"></span>
     </div>
 
-    <!-- STEP 8 -->
     <div class="step" onclick="recordTime(8)">
         <span id="label-8">In Bathroom teeth</span>
         <span id="time-8" class="time"></span>
         <span id="delta-8" class="delta"></span>
     </div>
 
-    <!-- STEP 9 -->
     <div class="step" onclick="recordTime(9)">
         <span id="label-9">Finish brushing teeth</span>
         <span id="time-9" class="time"></span>
         <span id="delta-9" class="delta"></span>
     </div>
 
-    <!-- STEP 10 -->
     <div class="step" onclick="recordTime(10)">
         <span id="label-10">Out of bathroom - Kitchen</span>
         <span id="time-10" class="time"></span>
@@ -99,34 +91,26 @@
 
 </div>
 
-<br>
+<!-- DAILY INPUTS -->
 <div class="daily-inputs">
 
-  <label for="sleepTime" class="sleep-label">
-    Sleep duration
-  </label>
-  <input type="time" id="sleepTime" aria-label="Sleep duration">
+    <label for="sleepTime" class="sleep-label">Sleep duration</label>
+    <input type="time" id="sleepTime" aria-label="Sleep duration">
 
-  <label for="sleepScore" class="sleep-label">
-    Sleep score
-  </label>
-  <input type="number" id="sleepScore" min="0" max="100">
+    <label for="sleepScore" class="sleep-label">Sleep score</label>
+    <input type="number" id="sleepScore" min="0" max="100">
 
-  <label for="dailyNote" class="sleep-label">
-    Note
-  </label>
-  <textarea id="dailyNote" rows="2"></textarea>
+    <label for="dailyNote" class="sleep-label">Daily note</label>
+    <textarea id="dailyNote" rows="2"></textarea>
 
 </div>
 
-    <input type="number" id="sleepScore" min="0" max="100" placeholder="Sleep score">
-
-    <textarea id="dailyNote" rows="2" placeholder="Daily note (optional)"></textarea>
-</div>
+<!-- ACTION BUTTONS -->
 <div class="action-buttons">
     <button onclick="showTotalDuration()">Show total duration</button>
     <button onclick="saveToHistory()">Save to history</button>
 </div>
+
 <!-- App logic -->
 <script src="app.js"></script>
 
