@@ -100,7 +100,13 @@
 </div>
 
 <br>
+<div class="daily-inputs">
+    <input type="time" id="sleepTime" placeholder="Sleep time">
 
+    <input type="number" id="sleepScore" min="0" max="100" placeholder="Sleep score">
+
+    <textarea id="dailyNote" rows="2" placeholder="Daily note (optional)"></textarea>
+</div>
 <div class="action-buttons">
     <button onclick="showTotalDuration()">Show total duration</button>
     <button onclick="saveToHistory()">Save to history</button>
