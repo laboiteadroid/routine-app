@@ -286,13 +286,20 @@ function loadHistory() {
     history.forEach(h => {
         const d = document.createElement("div");
         d.className = "history-entry";
+
         d.innerHTML = `
-            <strong>${h.date}</strong><br>
-            ${h.start} → ${h.end}<br>
-            <strong>${h.duration}</strong><br><br>
-            ${h.breakdown.join("<br>")}
+            <strong>${h.date}</strong><br><br>
+
+            <strong>Routines:</strong><br>
+            ${h.routineMinutes} minutes (${h.routineFormatted})<br><br>
+
+            ${h.sleepTime ? `<strong>Sleep:</strong> ${h.sleepTime}<br>` : ""}
+            ${h.sleepScore ? `<strong>Sleep score:</strong> ${h.sleepScore}<br>` : ""}
+
+            ${h.note ? `<br><strong>Note:</strong><br>${h.note}` : ""}
             <hr>
         `;
+
         container.appendChild(d);
     });
 }
