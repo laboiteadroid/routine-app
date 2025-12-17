@@ -326,3 +326,21 @@ header nav a:hover {
   font-weight: 600;
   margin-bottom: 6px;
 }
+.sleep-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.sleep-duration {
+  flex: 1;              /* prend l'espace restant */
+}
+
+.sleep-score {
+  width: 80px;          /* largeur fixe pour le score */
+}
+
+.sleep-score input {
+  width: 100%;
+  text-align: center;
+}
