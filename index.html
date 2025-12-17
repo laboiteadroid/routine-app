@@ -93,26 +93,27 @@
 
 <!-- DAILY INPUTS -->
 <div class="daily-inputs">
-<div class="sleep-row">
 
-  <div class="sleep-duration">
-    <label for="sleepTime">Sleep duration</label>
-    <input type="time" id="sleepTime">
-  </div>
-
-  <div class="sleep-score">
-    <label for="sleepScore">Score</label>
-    <input type="number" id="sleepScore" min="0" max="100" placeholder="--">
-  </div>
-
-</div>
+    <!-- Sleep row -->
     <div class="sleep-row">
-  <div class="sleep-duration">
-    <label for="sleepTime">Sleep duration</label>
-    
 
-    <label for="dailyNote" class="sleep-label">Daily note</label>
-    <textarea id="dailyNote" rows="2"></textarea>
+        <div class="sleep-duration">
+            <label for="sleepTime">Sleep duration</label>
+            <input type="time" id="sleepTime">
+        </div>
+
+        <div class="sleep-score">
+            <label for="sleepScore">Score</label>
+            <input type="number" id="sleepScore" min="0" max="100" placeholder="--">
+        </div>
+
+    </div>
+
+    <!-- Daily note -->
+    <div class="daily-note">
+        <label for="dailyNote">Daily note</label>
+        <textarea id="dailyNote" rows="2" placeholder="Optional"></textarea>
+    </div>
 
 </div>
 
