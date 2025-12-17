@@ -292,3 +292,37 @@ header nav a:hover {
   color: #555;
   margin: 8px 0 4px;
 }
+/* Sleep duration + score on one line */
+.sleep-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* Left block */
+.sleep-duration {
+  flex: 1;
+}
+
+/* Right block (score) */
+.sleep-score {
+  width: 70px;
+}
+
+/* Inputs */
+.sleep-row input {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+/* Labels */
+.sleep-row label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
