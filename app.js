@@ -204,26 +204,30 @@ function updateUI() {
  * Historique
  ************************/
 function saveToHistory() {
+function saveToHistory() {
     const d = calculateDuration();
     if (!d) return;
 
-    const breakdown = [];
-    for (let i = 2; i <= lastCompletedStep; i++) {
-        const el = document.getElementById(`delta-${i}`);
-        breakdown.push(`${stepNames[i - 1]} → ${stepNames[i]} : ${el?.textContent || ""}`);
-    }
+    const totalMinutes = d.min;
+    const formattedHours = minutesToHours(totalMinutes);
+
+    const sleepTime = document.getElementById("sleepTime")?.value || "";
+    const sleepScore = document.getElementById("sleepScore")?.value || "";
+    const note = document.getElementById("dailyNote")?.value || "";
 
     const history = JSON.parse(localStorage.getItem("history") || "[]");
 
     history.push({
         date: new Date().toLocaleDateString(),
-        start: d.start,
-        end: d.end,
-        duration: `${d.min}m ${d.sec}s`,
-        breakdown
+        routineMinutes: totalMinutes,
+        routineFormatted: formattedHours,
+        sleepTime,
+        sleepScore,
+        note
     });
 
     localStorage.setItem("history", JSON.stringify(history));
+
     resetRoutine();
 }
 
