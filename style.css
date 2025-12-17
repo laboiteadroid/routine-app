@@ -271,3 +271,17 @@ header nav a:hover {
     font-weight: 600;
     border-radius: 10px;
 }
+.daily-inputs {
+    margin: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.daily-inputs input,
+.daily-inputs textarea {
+    padding: 6px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
