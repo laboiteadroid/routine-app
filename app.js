@@ -204,7 +204,6 @@ function updateUI() {
  * Historique
  ************************/
 function saveToHistory() {
-function saveToHistory() {
     const d = calculateDuration();
     if (!d) return;
 
