@@ -1,251 +1,53 @@
-/* GENERAL PAGE STYLE */
+/* =========================
+   GLOBAL
+   ========================= */
 body {
-    background: #eef6ff; /* bleu très pâle */
+    background: #eef6ff;
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
 }
 
-
-/* NAVIGATION */
-nav {
-    display: flex;
-    gap: 20px;
-    padding: 15px;
-    background: #d0e6ff; /* bleu clair */
+/* =========================
+   HEADER / NAV
+   ========================= */
+header {
+    background: #d0e6ff;
+    padding: 10px;
     border-bottom: 2px solid #aacbff;
 }
 
-nav a {
-    text-decoration: none;
-    font-weight: bold;
-    color: #004a99;
-    font-size: 18px;            /* plus gros texte */
-    padding: 12px 8px;          /* plus grande zone cliquable */
-}
-
-nav a.active {
-    color: #003366;
-    text-decoration: underline;
-}
-
-
-/* TITLES */
-h2 {
-    padding: 15px;
-    margin: 0;
-    color: #003366;
-}
-
-
-/* STEP LIST */
-.step-list {
-    margin: 15px;
-}
-
-.step {
-    background: white;
-    border-radius: 12px;
-    padding: 15px;
-    margin-bottom: 10px;
-    font-size: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border: 1px solid #c5dcff;
-}
-
-.step:hover {
-    background: #f2f8ff;
-}
-
-
-/* TIME + DELTA */
-.time {
-    margin-left: 10px;
-    font-weight: bold;
-    color: #064b9b;
-}
-
-.delta {
-    margin-left: 15px;
-    font-size: 14px;
-    color: #0080ff;
-}
-
-
-/* BUTTONS */
-button {
-    background: #4d94ff;
-    color: white;
-    border: none;
-    padding: 12px 18px;
-    border-radius: 10px;
-    margin: 8px;
-    font-size: 15px;
-    cursor: pointer;
-}
-
-button:hover {
-    background: #3377ff;
-}
-
-
-/* HISTORY */
-.history-entry {
-    background: white;
-    border-radius: 12px;
-    padding: 15px;
-    margin: 15px;
-    border: 1px solid #c5dcff;
-}
-
-.muted {
-    color: #444;
-    margin-left: 10px;
-}
-}
-@media print {
-
-  body {
-    font-size: 9px;
-    line-height: 1.15;
-    margin: 8mm;
-  }
-
-  header,
-  nav,
-  button {
-    display: none !important;
-  }
-
-  /* 2 colonnes pour maximiser la page */
-  #history {
-    column-count: 2;
-    column-gap: 10mm;
-  }
-
-  .history-entry {
-    break-inside: avoid;
-    margin-bottom: 6px;
-    padding-bottom: 4px;
-    border-bottom: 1px solid #ccc;
-  }
-
-  hr {
-    margin: 4px 0;
-  }
-}
-/* ===== Routine step states ===== */
-
-.step {
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    transition: background-color 0.2s ease;
-}
-
-/* Étape complétée */
-.step.done {
-    background-color: #f0f0f0; /* gris très pâle */
-    color: #666;
-}
-
-/* Étape active (prochaine à cliquer) */
-.step.active {
-    background-color: #e6f4ea; /* vert très doux */
-    border: 1px solid #b7dfc3;
-}
-
-/* Empêcher clic visuel sur les étapes futures */
-.step.future {
-    opacity: 0.9;
-}
-/* =========================
-   ÉTAPE ACTIVE (ATTENTE CLIC)
-   ========================= */
-
-.step.active {
-    background-color: #e8f5e9;          /* vert pâle */
-    border-left: 4px solid #43a047;      /* vert pro */
-    animation: pulseStep 3s ease-in-out infinite;
-}
-
-/* Texte de l’étape active */
-.step.active span {
-    color: #1b5e20;                      /* vert foncé lisible */
-    font-weight: 600;
-}
-
-/* Animation douce (pro, non agressive) */
-@keyframes pulseStep {
-    0% {
-        box-shadow: 0 0 0 0 rgba(67, 160, 71, 0.35);
-    }
-    50% {
-        box-shadow: 0 0 10px 3px rgba(67, 160, 71, 0.25);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(67, 160, 71, 0.35);
-    }
-}
-/* ===== Header Navigation ===== */
-header {
-  background: #f4f6f8;
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-}
-
 header nav {
-  display: flex;
-  gap: 10px;
+    display: flex;
+    gap: 10px;
 }
 
-/* Liens onglets */
 header nav a {
-  flex: 1;
-  text-align: center;
-  padding: 10px 0;
-  text-decoration: none;
-  color: #333;
-  font-weight: 600;
-  border-radius: 8px;
-  background: #e9ecef;
-  transition: background 0.2s ease, box-shadow 0.2s ease;
+    flex: 1;
+    text-align: center;
+    padding: 12px 0;
+    text-decoration: none;
+    font-weight: 600;
+    color: #004a99;
+    border-radius: 10px;
+    background: #e9ecef;
 }
 
-/* Onglet actif */
 header nav a.active {
-  background: #2ecc71;        /* vert cohérent avec étape active */
-  color: white;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    background: #2ecc71;
+    color: white;
 }
 
-/* Effet léger au survol (desktop) */
-header nav a:hover {
-  background: #dfe3e6;
-}
-.step.done #label-1::before,
-.step.done #label-2::before,
-.step.done #label-3::before,
-.step.done #label-4::before,
-.step.done #label-5::before,
-.step.done #label-6::before,
-.step.done #label-7::before,
-.step.done #label-8::before,
-.step.done #label-9::before,
-.step.done #label-10::before {
-    content: "✔ ";
-    color: #2e7d32;        /* vert professionnel */
-    font-weight: bold;
-}
+/* =========================
+   CURRENT STEP
+   ========================= */
 .current-step {
     text-align: center;
     margin: 16px 0 20px;
 }
 
 .current-label {
-    font-size: 14px;
+    font-size: 13px;
     color: #666;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -255,120 +57,201 @@ header nav a:hover {
     font-size: 20px;
     font-weight: 600;
     margin-top: 6px;
-    min-height: 1.4em; /* stabilité visuelle */
-}
-.action-buttons {
-    display: flex;
-    justify-content: center;   /* centrage horizontal */
-    gap: 12px;
-    padding: 16px;
+    min-height: 1.4em;
 }
 
-.action-buttons button {
-    min-width: 150px;
-    padding: 14px 16px;
-    font-size: 15px;
-    font-weight: 600;
-    border-radius: 10px;
+/* =========================
+   STEP LIST
+   ========================= */
+.step-list {
+    margin: 15px;
 }
+
+.step {
+    background: white;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #c5dcff;
+    transition: background-color 0.2s ease;
+}
+
+/* Hover */
+.step:hover {
+    background: #f2f8ff;
+}
+
+/* Completed */
+.step.done {
+    background: #f0f0f0;
+    color: #666;
+}
+
+/* Active */
+.step.active {
+    background: #e8f5e9;
+    border-left: 4px solid #43a047;
+    animation: pulseStep 3s ease-in-out infinite;
+}
+
+.step.active span {
+    color: #1b5e20;
+    font-weight: 600;
+}
+
+/* Future */
+.step.future {
+    opacity: 0.9;
+}
+
+/* Checkmark */
+.step.done span::before {
+    content: "✔ ";
+    color: #2e7d32;
+    font-weight: bold;
+}
+
+/* Animation */
+@keyframes pulseStep {
+    0% { box-shadow: 0 0 0 0 rgba(67,160,71,.35); }
+    50% { box-shadow: 0 0 10px 3px rgba(67,160,71,.25); }
+    100% { box-shadow: 0 0 0 0 rgba(67,160,71,.35); }
+}
+
+/* =========================
+   TIME / DELTA
+   ========================= */
+.time {
+    font-weight: bold;
+    color: #064b9b;
+    margin-left: 10px;
+}
+
+.delta {
+    font-size: 13px;
+    color: #0080ff;
+    margin-left: 12px;
+}
+
+/* =========================
+   DAILY INPUTS
+   ========================= */
 .daily-inputs {
     margin: 15px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 }
 
-.daily-inputs input,
-.daily-inputs textarea {
-    padding: 6px;
-    font-size: 14px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-}
-.sleep-label {
-  display: block;
-  font-size: 13px;
-  font-weight: 500;
-  color: #555;
-  margin: 8px 0 4px;
-}
-/* Sleep duration + score on one line */
-.sleep-row {
-  display: flex;
-  align-items: flex-end;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-/* Left block */
-.sleep-duration {
-  flex: 1;
-}
-
-/* Right block (score) */
-.sleep-score {
-  width: 70px;
-}
-
-/* Inputs */
-.sleep-row input {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-}
-
-/* Labels */
-.sleep-row label {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 6px;
-}
-.sleep-row {
-  display: flex;
-  gap: 12px;
-  align-items: flex-end;
-}
-
-.sleep-duration {
-  flex: 1;              /* prend l'espace restant */
-}
-
-.sleep-score {
-  width: 80px;          /* largeur fixe pour le score */
-}
-
-.sleep-score input {
-  width: 100%;
-  text-align: center;
-}
-/* Ligne sleep (duration + score) */
+/* Sleep row */
 .sleep-row {
     display: flex;
-    gap: 12px;
+    gap: 8px;                /* 🔑 petit espace propre */
     align-items: flex-end;
 }
 
 /* Sleep duration */
 .sleep-duration {
-    flex: 0 0 60%;
+    flex: 1;
 }
 
-/* Champ time plus compact */
 .sleep-duration input[type="time"] {
     width: 100%;
-    max-width: 220px; /* 🔑 ajuste ici si tu veux plus ou moins long */
+    max-width: 220px;        /* 🔑 longueur maîtrisée */
 }
 
 /* Sleep score */
 .sleep-score {
-    flex: 0 0 40%;
+    width: 70px;
 }
 
 .sleep-score input {
     width: 100%;
-    max-width: 80px; /* parfait pour 2 chiffres */
     text-align: center;
+}
+
+/* Inputs */
+.daily-inputs input,
+.daily-inputs textarea {
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+/* Labels */
+.daily-inputs label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 4px;
+}
+
+/* =========================
+   ACTION BUTTONS
+   ========================= */
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 16px;
+}
+
+.action-buttons button {
+    background: #4d94ff;
+    color: white;
+    border: none;
+    min-width: 150px;
+    padding: 14px 16px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.action-buttons button:hover {
+    background: #3377ff;
+}
+
+/* =========================
+   HISTORY
+   ========================= */
+.history-entry {
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    margin: 15px;
+    border: 1px solid #c5dcff;
+}
+
+/* =========================
+   PRINT
+   ========================= */
+@media print {
+    body {
+        font-size: 9px;
+        line-height: 1.15;
+        margin: 8mm;
     }
+
+    header,
+    nav,
+    button {
+        display: none !important;
+    }
+
+    #history {
+        column-count: 2;
+        column-gap: 10mm;
+    }
+
+    .history-entry {
+        break-inside: avoid;
+        margin-bottom: 6px;
+        padding-bottom: 4px;
+        border-bottom: 1px solid #ccc;
+    }
+}
