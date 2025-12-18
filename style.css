@@ -259,3 +259,35 @@ header nav a.active {
         border-bottom: 1px solid #ccc;
     }
 }
+/* Sleep row */
+.sleep-row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;   /* 🔑 aligne les blocs par le haut */
+}
+
+/* Colonnes */
+.sleep-duration,
+.sleep-score {
+    display: flex;
+    flex-direction: column;   /* 🔑 label AU-DESSUS du champ */
+}
+
+/* Sleep duration */
+.sleep-duration {
+    flex: 1;
+}
+
+.sleep-duration input[type="time"] {
+    width: 100%;
+    max-width: 220px;
+}
+
+/* Sleep score */
+.sleep-score {
+    width: 70px;
+}
+
+.sleep-score input {
+    text-align: center;
+}
