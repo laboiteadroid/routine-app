@@ -272,10 +272,11 @@ header nav a.active {
     display: flex;
     gap: 12px;
     align-items: flex-start;
-
-    /* 🔑 même logique que les cartes */
-    width: 100%;
+    
+    /* 🔑 Même alignement que les autres boîtes */
+    margin: 0 auto;
     max-width: 600px;
+    width: 100%;
 }
 
 /* Colonnes */
@@ -287,19 +288,29 @@ header nav a.active {
 
 /* Sleep duration */
 .sleep-duration {
-    flex: 1; /* prend l'espace principal */
+    flex: 1;
 }
 
 .sleep-duration input[type="time"] {
     width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: white;
 }
 
 /* Sleep score */
 .sleep-score {
-    width: 70px; /* compact et maîtrisé */
+    width: 70px;
 }
 
 .sleep-score input {
     width: 100%;
     text-align: center;
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: white;
 }
