@@ -9,7 +9,7 @@ body {
 }
 
 /* =========================
-   HEADER / NAV
+   HEADER / NAVIGATION
    ========================= */
 header {
     background: #d0e6ff;
@@ -31,11 +31,13 @@ header nav a {
     color: #004a99;
     border-radius: 10px;
     background: #e9ecef;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
 }
 
 header nav a.active {
     background: #2ecc71;
     color: white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
 /* =========================
@@ -80,18 +82,17 @@ header nav a.active {
     transition: background-color 0.2s ease;
 }
 
-/* Hover */
 .step:hover {
     background: #f2f8ff;
 }
 
-/* Completed */
+/* Completed step */
 .step.done {
     background: #f0f0f0;
     color: #666;
 }
 
-/* Active */
+/* Active step */
 .step.active {
     background: #e8f5e9;
     border-left: 4px solid #43a047;
@@ -103,27 +104,27 @@ header nav a.active {
     font-weight: 600;
 }
 
-/* Future */
+/* Future steps */
 .step.future {
     opacity: 0.9;
 }
 
-/* Checkmark */
-.step.done span::before {
+/* Checkmark on completed step labels */
+.step.done .label::before {
     content: "✔ ";
     color: #2e7d32;
     font-weight: bold;
 }
 
-/* Animation */
+/* Pulse animation */
 @keyframes pulseStep {
-    0% { box-shadow: 0 0 0 0 rgba(67,160,71,.35); }
-    50% { box-shadow: 0 0 10px 3px rgba(67,160,71,.25); }
-    100% { box-shadow: 0 0 0 0 rgba(67,160,71,.35); }
+    0% { box-shadow: 0 0 0 0 rgba(67,160,71,0.35); }
+    50% { box-shadow: 0 0 10px 3px rgba(67,160,71,0.25); }
+    100% { box-shadow: 0 0 0 0 rgba(67,160,71,0.35); }
 }
 
 /* =========================
-   TIME / DELTA
+   TIME & DELTA
    ========================= */
 .time {
     font-weight: bold;
@@ -141,18 +142,17 @@ header nav a.active {
    DAILY INPUTS
    ========================= */
 .daily-inputs {
-    margin: 15px auto;          /* centre comme les étapes */
+    margin: 15px auto;
+    max-width: 600px;
     display: flex;
     flex-direction: column;
     gap: 10px;
-
-    max-width: 600px;           /* 🔑 même largeur que .step-list */
 }
 
-/* Sleep row */
+/* Sleep row (duration + score) */
 .sleep-row {
     display: flex;
-    gap: 8px;                /* 🔑 petit espace propre */
+    gap: 10px;                /* 🔑 espace entre duration et score */
     align-items: flex-end;
 }
 
@@ -163,7 +163,7 @@ header nav a.active {
 
 .sleep-duration input[type="time"] {
     width: 100%;
-    max-width: 220px;        /* 🔑 longueur maîtrisée */
+    max-width: 220px;
 }
 
 /* Sleep score */
@@ -183,6 +183,7 @@ header nav a.active {
     font-size: 14px;
     border-radius: 8px;
     border: 1px solid #ccc;
+    background: white;
 }
 
 /* Labels */
@@ -231,7 +232,7 @@ header nav a.active {
 }
 
 /* =========================
-   PRINT
+   PRINT MODE
    ========================= */
 @media print {
     body {
