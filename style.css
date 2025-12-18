@@ -344,3 +344,31 @@ header nav a:hover {
   width: 100%;
   text-align: center;
 }
+/* Ligne sleep (duration + score) */
+.sleep-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+}
+
+/* Sleep duration */
+.sleep-duration {
+    flex: 0 0 60%;
+}
+
+/* Champ time plus compact */
+.sleep-duration input[type="time"] {
+    width: 100%;
+    max-width: 220px; /* 🔑 ajuste ici si tu veux plus ou moins long */
+}
+
+/* Sleep score */
+.sleep-score {
+    flex: 0 0 40%;
+}
+
+.sleep-score input {
+    width: 100%;
+    max-width: 80px; /* parfait pour 2 chiffres */
+    text-align: center;
+    }
