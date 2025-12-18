@@ -265,38 +265,41 @@ header nav a.active {
     text-align: center;
 }
 /* =========================
-   SLEEP INPUTS (CLEAN)
+   SLEEP INPUTS – ALIGNEMENT PARFAIT
    ========================= */
 
 .sleep-row {
     display: flex;
-    gap: 8px;
-    align-items: flex-start; /* labels alignés en haut */
+    gap: 12px;
+    align-items: flex-start;
+
+    /* 🔑 même logique que les cartes */
+    width: 100%;
+    max-width: 600px;
 }
 
 /* Colonnes */
 .sleep-duration,
 .sleep-score {
     display: flex;
-    flex-direction: column; /* label AU-DESSUS du champ */
+    flex-direction: column;
 }
 
 /* Sleep duration */
 .sleep-duration {
-    flex: 1;
+    flex: 1; /* prend l'espace principal */
 }
 
 .sleep-duration input[type="time"] {
     width: 100%;
-    max-width: 220px;
 }
 
 /* Sleep score */
 .sleep-score {
-    width: 70px;
+    width: 70px; /* compact et maîtrisé */
 }
 
 .sleep-score input {
     width: 100%;
     text-align: center;
-   }
+}
