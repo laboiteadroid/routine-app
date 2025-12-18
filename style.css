@@ -140,10 +140,12 @@ header nav a.active {
    DAILY INPUTS
    ========================= */
 .daily-inputs {
-    margin: 15px;
+    margin: 15px auto;          /* centre comme les étapes */
     display: flex;
     flex-direction: column;
     gap: 10px;
+
+    max-width: 600px;           /* 🔑 même largeur que .step-list */
 }
 
 /* Sleep row */
