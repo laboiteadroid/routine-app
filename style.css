@@ -64,7 +64,8 @@ header nav a.active {
    STEP LIST
    ========================= */
 .step-list {
-    margin: 15px;
+    margin: 15px auto;
+    max-width: 600px;
 }
 
 .step {
@@ -145,7 +146,7 @@ header nav a.active {
     flex-direction: column;
     gap: 10px;
 
-    max-width: 400px;           /* 🔑 même largeur que .step-list */
+    max-width: 600px;           /* 🔑 même largeur que .step-list */
 }
 
 /* Sleep row */
