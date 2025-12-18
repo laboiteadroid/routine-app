@@ -149,33 +149,6 @@ header nav a.active {
     gap: 10px;
 }
 
-/* Sleep row (duration + score) */
-.sleep-row {
-    display: flex;
-    gap: 10px;                /* 🔑 espace entre duration et score */
-    align-items: flex-end;
-}
-
-/* Sleep duration */
-.sleep-duration {
-    flex: 1;
-}
-
-.sleep-duration input[type="time"] {
-    width: 100%;
-    max-width: 220px;
-}
-
-/* Sleep score */
-.sleep-score {
-    width: 70px;
-}
-
-.sleep-score input {
-    width: 100%;
-    text-align: center;
-}
-
 /* Inputs */
 .daily-inputs input,
 .daily-inputs textarea {
@@ -291,3 +264,39 @@ header nav a.active {
 .sleep-score input {
     text-align: center;
 }
+/* =========================
+   SLEEP INPUTS (CLEAN)
+   ========================= */
+
+.sleep-row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start; /* labels alignés en haut */
+}
+
+/* Colonnes */
+.sleep-duration,
+.sleep-score {
+    display: flex;
+    flex-direction: column; /* label AU-DESSUS du champ */
+}
+
+/* Sleep duration */
+.sleep-duration {
+    flex: 1;
+}
+
+.sleep-duration input[type="time"] {
+    width: 100%;
+    max-width: 220px;
+}
+
+/* Sleep score */
+.sleep-score {
+    width: 70px;
+}
+
+.sleep-score input {
+    width: 100%;
+    text-align: center;
+   }
