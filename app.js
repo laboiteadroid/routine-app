@@ -51,7 +51,14 @@ window.addEventListener("load", () => {
     restoreDeltas();
     checkAutoSave(); // 🛡️ sécurité post-refresh
 });
+window.addEventListener("load", () => {
+    restoreDailyInputs();
 
+    ["sleepTime", "sleepScore", "dailyNote"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener("input", saveDailyInputs);
+    });
+});
 /***********************
  * Utils temps
  ************************/
@@ -248,7 +255,7 @@ function resetRoutine() {
         if (el) el.textContent = "";
     }
 }
-
+localStorage.removeItem("dailyInputs");
 /***********************
  * Restaurer durées
  ************************/
@@ -309,4 +316,25 @@ function clearHistory() {
         localStorage.removeItem("history");
         loadHistory();
     }
+}
+/***********************
+ * Sleep & note persistence (anti refresh)
+ ************************/
+function saveDailyInputs() {
+    const data = {
+        sleepTime: document.getElementById("sleepTime")?.value || "",
+        sleepScore: document.getElementById("sleepScore")?.value || "",
+        dailyNote: document.getElementById("dailyNote")?.value || ""
+    };
+    localStorage.setItem("dailyInputs", JSON.stringify(data));
+}
+
+function restoreDailyInputs() {
+    const saved = localStorage.getItem("dailyInputs");
+    if (!saved) return;
+
+    const data = JSON.parse(saved);
+    if (document.getElementById("sleepTime")) document.getElementById("sleepTime").value = data.sleepTime || "";
+    if (document.getElementById("sleepScore")) document.getElementById("sleepScore").value = data.sleepScore || "";
+    if (document.getElementById("dailyNote")) document.getElementById("dailyNote").value = data.dailyNote || "";
 }
