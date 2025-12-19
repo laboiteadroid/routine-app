@@ -237,6 +237,10 @@ function resetRoutine() {
         if (el) el.textContent = "";
     }
 }
+// Reset visuel des champs sommeil / note
+if (document.getElementById("sleepTime")) document.getElementById("sleepTime").value = "";
+if (document.getElementById("sleepScore")) document.getElementById("sleepScore").value = "";
+if (document.getElementById("dailyNote")) document.getElementById("dailyNote").value = "";
 
 /* =====================
    RESTORE DELTAS
