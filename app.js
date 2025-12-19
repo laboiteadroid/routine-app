@@ -1,6 +1,5 @@
 /***********************
- * Routine App JS v4.0 FINAL
- * Android Chrome / PWA SAFE
+ * Routine App JS v4.1 FINAL FIXED
  ************************/
 
 /* =====================
@@ -25,13 +24,6 @@ const stepNames = [
     "Finish brushing teeth",
     "Out of bathroom - Kitchen"
 ];
-
-/* =====================
-   SAFETY
-   ===================== */
-if (!localStorage.getItem("currentRoutine")) {
-    localStorage.removeItem("routineSaved");
-}
 
 /* =====================
    INIT
@@ -88,26 +80,21 @@ function minutesToHours(min) {
 }
 
 /* =====================
-   CURRENT STEP LABEL
+   CURRENT STEP
    ===================== */
 function updateCurrentStep() {
     const el = document.getElementById("focusStep");
     if (!el) return;
 
-    if (lastCompletedStep === 0) {
-        el.textContent = stepNames[1];
-    } else if (lastCompletedStep === 10) {
-        el.textContent = "Routine finished";
-    } else {
-        el.textContent = stepNames[lastCompletedStep + 1];
-    }
+    if (lastCompletedStep === 0) el.textContent = stepNames[1];
+    else if (lastCompletedStep === 10) el.textContent = "Routine finished";
+    else el.textContent = stepNames[lastCompletedStep + 1];
 }
 
 /* =====================
    RECORD STEP
    ===================== */
 function recordTime(stepNumber) {
-
     if (steps[stepNumber] !== null) return;
     if (stepNumber !== lastCompletedStep + 1) return;
 
@@ -151,12 +138,11 @@ function checkAutoSave() {
 }
 
 /* =====================
-   TOTAL DURATION
+   DURATION
    ===================== */
 function calculateDuration() {
     const first = steps.find(s => s);
     const last = [...steps].reverse().find(s => s);
-
     if (!first || !last || first === last) return null;
 
     const a = parseFrenchTime(first);
@@ -168,13 +154,7 @@ function calculateDuration() {
     e.setHours(b.hour, b.minute, 0);
 
     const diff = e - s;
-
-    return {
-        start: first,
-        end: last,
-        min: Math.floor(diff / 60000),
-        sec: Math.floor((diff % 60000) / 1000)
-    };
+    return { min: Math.floor(diff / 60000) };
 }
 
 /* =====================
@@ -209,9 +189,9 @@ function saveToHistory() {
         date: new Date().toLocaleDateString(),
         routineMinutes: d.min,
         routineFormatted: minutesToHours(d.min),
-        sleepTime: document.getElementById("sleepTime")?.value || "",
-        sleepScore: document.getElementById("sleepScore")?.value || "",
-        note: document.getElementById("dailyNote")?.value || ""
+        sleepTime: document.getElementById("sleepTime").value || "",
+        sleepScore: document.getElementById("sleepScore").value || "",
+        note: document.getElementById("dailyNote").value || ""
     });
 
     localStorage.setItem("history", JSON.stringify(history));
@@ -219,31 +199,37 @@ function saveToHistory() {
 }
 
 /* =====================
-   RESET ROUTINE
+   RESET ROUTINE (FIX FINAL)
    ===================== */
 function resetRoutine() {
+
+    // Reset state
     steps = Array(11).fill(null);
     lastCompletedStep = 0;
 
+    // Clear storage
     localStorage.removeItem("currentRoutine");
     localStorage.removeItem("routineSaved");
-    localStorage.removeItem("dailyInputs"); // ✅ CORRECTION CLÉ
+    localStorage.removeItem("dailyInputs");
 
+    // Reset UI
     updateUI();
     updateCurrentStep();
 
+    // Clear deltas
     for (let i = 2; i <= 10; i++) {
         const el = document.getElementById(`delta-${i}`);
         if (el) el.textContent = "";
     }
+
+    // ✅ CLEAR DAILY INPUTS VISUALLY (BON ENDROIT)
+    document.getElementById("sleepTime").value = "";
+    document.getElementById("sleepScore").value = "";
+    document.getElementById("dailyNote").value = "";
 }
-// Reset visuel des champs sommeil / note
-if (document.getElementById("sleepTime")) document.getElementById("sleepTime").value = "";
-if (document.getElementById("sleepScore")) document.getElementById("sleepScore").value = "";
-if (document.getElementById("dailyNote")) document.getElementById("dailyNote").value = "";
 
 /* =====================
-   RESTORE DELTAS
+   DELTAS RESTORE
    ===================== */
 function restoreDeltas() {
     for (let i = 2; i <= 10; i++) {
@@ -267,45 +253,13 @@ function restoreDeltas() {
 }
 
 /* =====================
-   HISTORY PAGE
-   ===================== */
-function loadHistory() {
-    const container = document.getElementById("history");
-    if (!container) return;
-
-    const history = JSON.parse(localStorage.getItem("history") || "[]");
-    container.innerHTML = "";
-
-    history.forEach(h => {
-        const d = document.createElement("div");
-        d.className = "history-entry";
-        d.innerHTML = `
-            <strong>${h.date}</strong><br><br>
-            <strong>Routine:</strong> ${h.routineFormatted}<br><br>
-            ${h.sleepTime ? `<strong>Sleep:</strong> ${h.sleepTime}<br>` : ""}
-            ${h.sleepScore ? `<strong>Score:</strong> ${h.sleepScore}<br>` : ""}
-            ${h.note ? `<br><strong>Note:</strong><br>${h.note}` : ""}
-            <hr>
-        `;
-        container.appendChild(d);
-    });
-}
-
-function clearHistory() {
-    if (confirm("Clear history?")) {
-        localStorage.removeItem("history");
-        loadHistory();
-    }
-}
-
-/* =====================
    DAILY INPUTS PERSISTENCE
    ===================== */
 function saveDailyInputs() {
     localStorage.setItem("dailyInputs", JSON.stringify({
-        sleepTime: document.getElementById("sleepTime")?.value || "",
-        sleepScore: document.getElementById("sleepScore")?.value || "",
-        dailyNote: document.getElementById("dailyNote")?.value || ""
+        sleepTime: document.getElementById("sleepTime").value || "",
+        sleepScore: document.getElementById("sleepScore").value || "",
+        dailyNote: document.getElementById("dailyNote").value || ""
     }));
 }
 
@@ -314,7 +268,7 @@ function restoreDailyInputs() {
     if (!saved) return;
 
     const d = JSON.parse(saved);
-    if (document.getElementById("sleepTime")) document.getElementById("sleepTime").value = d.sleepTime || "";
-    if (document.getElementById("sleepScore")) document.getElementById("sleepScore").value = d.sleepScore || "";
-    if (document.getElementById("dailyNote")) document.getElementById("dailyNote").value = d.dailyNote || "";
+    document.getElementById("sleepTime").value = d.sleepTime || "";
+    document.getElementById("sleepScore").value = d.sleepScore || "";
+    document.getElementById("dailyNote").value = d.dailyNote || "";
 }
