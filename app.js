@@ -1,14 +1,17 @@
 /***********************
- * Routine App JS v4.0 FINAL OFFICIELLE
+ * Routine App JS v4.0 FINAL
  * Android Chrome / PWA SAFE
  ************************/
 
+/* =====================
+   STATE
+   ===================== */
 let steps = Array(11).fill(null);
 let lastCompletedStep = 0;
 
-/***********************
- * Noms des étapes
- ************************/
+/* =====================
+   STEP NAMES
+   ===================== */
 const stepNames = [
     "",
     "Start wake-up",
@@ -23,19 +26,20 @@ const stepNames = [
     "Out of bathroom - Kitchen"
 ];
 
-/***********************
- * Sécurité anti-blocage
- ************************/
+/* =====================
+   SAFETY
+   ===================== */
 if (!localStorage.getItem("currentRoutine")) {
     localStorage.removeItem("routineSaved");
 }
 
-/***********************
- * Chargement initial
- ************************/
+/* =====================
+   INIT
+   ===================== */
 window.addEventListener("load", () => {
-    const saved = localStorage.getItem("currentRoutine");
 
+    // Restore routine
+    const saved = localStorage.getItem("currentRoutine");
     if (saved) {
         steps = JSON.parse(saved);
         for (let i = 10; i >= 1; i--) {
@@ -46,22 +50,23 @@ window.addEventListener("load", () => {
         }
     }
 
-    updateUI();
-    updateCurrentStep();
-    restoreDeltas();
-    checkAutoSave(); // 🛡️ sécurité post-refresh
-});
-window.addEventListener("load", () => {
+    // Restore daily inputs
     restoreDailyInputs();
 
     ["sleepTime", "sleepScore", "dailyNote"].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.addEventListener("input", saveDailyInputs);
     });
+
+    updateUI();
+    updateCurrentStep();
+    restoreDeltas();
+    checkAutoSave();
 });
-/***********************
- * Utils temps
- ************************/
+
+/* =====================
+   TIME UTILS
+   ===================== */
 function parseFrenchTime(t) {
     if (!t) return null;
     const p = t.replace(" h ", ":").split(":");
@@ -75,56 +80,48 @@ function nowFormatted() {
         hour12: false
     }).replace(":", " h ");
 }
+
 function minutesToHours(min) {
     const h = Math.floor(min / 60);
     const m = min % 60;
     return `${h.toString().padStart(2, "0")} h ${m.toString().padStart(2, "0")} min`;
 }
-/***********************
- * Texte étape courante
- ************************/
+
+/* =====================
+   CURRENT STEP LABEL
+   ===================== */
 function updateCurrentStep() {
     const el = document.getElementById("focusStep");
     if (!el) return;
 
     if (lastCompletedStep === 0) {
         el.textContent = stepNames[1];
-        return;
-    }
-
-    if (lastCompletedStep === 10) {
+    } else if (lastCompletedStep === 10) {
         el.textContent = "Routine finished";
-        return;
+    } else {
+        el.textContent = stepNames[lastCompletedStep + 1];
     }
-
-    el.textContent = stepNames[lastCompletedStep + 1];
 }
 
-/***********************
- * ENREGISTRER UNE ÉTAPE
- * + protection anti-double-clic
- ************************/
+/* =====================
+   RECORD STEP
+   ===================== */
 function recordTime(stepNumber) {
 
-    // 🚫 Étape déjà enregistrée
     if (steps[stepNumber] !== null) return;
-
-    // 🚫 Respect de l'ordre strict
     if (stepNumber !== lastCompletedStep + 1) return;
 
-    const formatted = nowFormatted();
-    steps[stepNumber] = formatted;
+    steps[stepNumber] = nowFormatted();
 
-    // ⏱️ Calcul durée étape précédente
     if (stepNumber > 1 && steps[stepNumber - 1]) {
-        const t1 = parseFrenchTime(steps[stepNumber - 1]);
-        const t2 = parseFrenchTime(steps[stepNumber]);
+        const a = parseFrenchTime(steps[stepNumber - 1]);
+        const b = parseFrenchTime(steps[stepNumber]);
 
-        if (t1 && t2) {
+        if (a && b) {
             const s = new Date();
             const e = new Date();
-            s.setHours(t1.hour, t1.minute, 0);
-            e.setHours(t2.hour, t2.minute, 0);
+            s.setHours(a.hour, a.minute, 0);
+            e.setHours(b.hour, b.minute, 0);
 
             const diff = e - s;
             const m = Math.floor(diff / 60000);
@@ -136,18 +133,16 @@ function recordTime(stepNumber) {
     }
 
     lastCompletedStep = stepNumber;
-
-    // 💾 Anti-crash immédiat
     localStorage.setItem("currentRoutine", JSON.stringify(steps));
 
     updateUI();
     updateCurrentStep();
-    checkAutoSave(); // ⭐ clé de la v4.0
+    checkAutoSave();
 }
 
-/***********************
- * SAUVEGARDE AUTO ROBUSTE
- ************************/
+/* =====================
+   AUTO SAVE
+   ===================== */
 function checkAutoSave() {
     if (lastCompletedStep === 10 && !localStorage.getItem("routineSaved")) {
         localStorage.setItem("routineSaved", "true");
@@ -155,9 +150,9 @@ function checkAutoSave() {
     }
 }
 
-/***********************
- * Calcul durée totale
- ************************/
+/* =====================
+   TOTAL DURATION
+   ===================== */
 function calculateDuration() {
     const first = steps.find(s => s);
     const last = [...steps].reverse().find(s => s);
@@ -173,6 +168,7 @@ function calculateDuration() {
     e.setHours(b.hour, b.minute, 0);
 
     const diff = e - s;
+
     return {
         start: first,
         end: last,
@@ -181,71 +177,57 @@ function calculateDuration() {
     };
 }
 
-/***********************
- * UI états visuels
- ************************/
+/* =====================
+   UI UPDATE
+   ===================== */
 function updateUI() {
     for (let i = 1; i <= 10; i++) {
         const timeEl = document.getElementById(`time-${i}`);
         const stepEl = timeEl?.closest(".step");
 
-        if (timeEl) {
-            timeEl.textContent = steps[i] || "--:--";
-        }
-
+        if (timeEl) timeEl.textContent = steps[i] || "--:--";
         if (!stepEl) continue;
 
         stepEl.classList.remove("done", "active", "future");
 
-        if (steps[i]) {
-            stepEl.classList.add("done");
-        } else if (i === lastCompletedStep + 1) {
-            stepEl.classList.add("active");
-        } else {
-            stepEl.classList.add("future");
-        }
+        if (steps[i]) stepEl.classList.add("done");
+        else if (i === lastCompletedStep + 1) stepEl.classList.add("active");
+        else stepEl.classList.add("future");
     }
 }
 
-/***********************
- * Historique
- ************************/
+/* =====================
+   SAVE TO HISTORY
+   ===================== */
 function saveToHistory() {
     const d = calculateDuration();
     if (!d) return;
-
-    const totalMinutes = d.min;
-    const formattedHours = minutesToHours(totalMinutes);
-
-    const sleepTime = document.getElementById("sleepTime")?.value || "";
-    const sleepScore = document.getElementById("sleepScore")?.value || "";
-    const note = document.getElementById("dailyNote")?.value || "";
 
     const history = JSON.parse(localStorage.getItem("history") || "[]");
 
     history.push({
         date: new Date().toLocaleDateString(),
-        routineMinutes: totalMinutes,
-        routineFormatted: formattedHours,
-        sleepTime,
-        sleepScore,
-        note
+        routineMinutes: d.min,
+        routineFormatted: minutesToHours(d.min),
+        sleepTime: document.getElementById("sleepTime")?.value || "",
+        sleepScore: document.getElementById("sleepScore")?.value || "",
+        note: document.getElementById("dailyNote")?.value || ""
     });
 
     localStorage.setItem("history", JSON.stringify(history));
-
     resetRoutine();
 }
 
-/***********************
- * RESET COMPLET PROPRE
- ************************/
+/* =====================
+   RESET ROUTINE
+   ===================== */
 function resetRoutine() {
     steps = Array(11).fill(null);
     lastCompletedStep = 0;
 
     localStorage.removeItem("currentRoutine");
     localStorage.removeItem("routineSaved");
+    localStorage.removeItem("dailyInputs"); // ✅ CORRECTION CLÉ
 
     updateUI();
     updateCurrentStep();
@@ -255,10 +237,10 @@ function resetRoutine() {
         if (el) el.textContent = "";
     }
 }
-localStorage.removeItem("dailyInputs");
-/***********************
- * Restaurer durées
- ************************/
+
+/* =====================
+   RESTORE DELTAS
+   ===================== */
 function restoreDeltas() {
     for (let i = 2; i <= 10; i++) {
         if (steps[i] && steps[i - 1]) {
@@ -280,9 +262,9 @@ function restoreDeltas() {
     }
 }
 
-/***********************
- * Page History
- ************************/
+/* =====================
+   HISTORY PAGE
+   ===================== */
 function loadHistory() {
     const container = document.getElementById("history");
     if (!container) return;
@@ -293,20 +275,14 @@ function loadHistory() {
     history.forEach(h => {
         const d = document.createElement("div");
         d.className = "history-entry";
-
         d.innerHTML = `
             <strong>${h.date}</strong><br><br>
-
-            <strong>Routines:</strong><br>
-            ${h.routineMinutes} minutes (${h.routineFormatted})<br><br>
-
+            <strong>Routine:</strong> ${h.routineFormatted}<br><br>
             ${h.sleepTime ? `<strong>Sleep:</strong> ${h.sleepTime}<br>` : ""}
-            ${h.sleepScore ? `<strong>Sleep score:</strong> ${h.sleepScore}<br>` : ""}
-
+            ${h.sleepScore ? `<strong>Score:</strong> ${h.sleepScore}<br>` : ""}
             ${h.note ? `<br><strong>Note:</strong><br>${h.note}` : ""}
             <hr>
         `;
-
         container.appendChild(d);
     });
 }
@@ -317,24 +293,24 @@ function clearHistory() {
         loadHistory();
     }
 }
-/***********************
- * Sleep & note persistence (anti refresh)
- ************************/
+
+/* =====================
+   DAILY INPUTS PERSISTENCE
+   ===================== */
 function saveDailyInputs() {
-    const data = {
+    localStorage.setItem("dailyInputs", JSON.stringify({
         sleepTime: document.getElementById("sleepTime")?.value || "",
         sleepScore: document.getElementById("sleepScore")?.value || "",
         dailyNote: document.getElementById("dailyNote")?.value || ""
-    };
-    localStorage.setItem("dailyInputs", JSON.stringify(data));
+    }));
 }
 
 function restoreDailyInputs() {
     const saved = localStorage.getItem("dailyInputs");
     if (!saved) return;
 
-    const data = JSON.parse(saved);
-    if (document.getElementById("sleepTime")) document.getElementById("sleepTime").value = data.sleepTime || "";
-    if (document.getElementById("sleepScore")) document.getElementById("sleepScore").value = data.sleepScore || "";
-    if (document.getElementById("dailyNote")) document.getElementById("dailyNote").value = data.dailyNote || "";
+    const d = JSON.parse(saved);
+    if (document.getElementById("sleepTime")) document.getElementById("sleepTime").value = d.sleepTime || "";
+    if (document.getElementById("sleepScore")) document.getElementById("sleepScore").value = d.sleepScore || "";
+    if (document.getElementById("dailyNote")) document.getElementById("dailyNote").value = d.dailyNote || "";
 }
