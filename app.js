@@ -146,20 +146,25 @@ function checkAutoSave() {
    DURATION
    ===================== */
 function calculateDuration() {
-    const first = steps.find(s => s);
-    const last = [...steps].reverse().find(s => s);
-    if (!first || !last || first === last) return null;
+    const times = steps.filter(Boolean);
+    if (times.length < 2) return null;
 
-    const a = parseFrenchTime(first);
-    const b = parseFrenchTime(last);
+    const a = parseFrenchTime(times[0]);
+    const b = parseFrenchTime(times[times.length - 1]);
 
     const s = new Date();
     const e = new Date();
     s.setHours(a.hour, a.minute, 0);
     e.setHours(b.hour, b.minute, 0);
 
-    const diff = e - s;
-    return { min: Math.floor(diff / 60000) };
+    let diff = e - s;
+
+    // Sécurité si passage minuit
+    if (diff < 0) diff += 24 * 60 * 60 * 1000;
+
+    return {
+        min: Math.floor(diff / 60000)
+    };
 }
 
 /* =====================
