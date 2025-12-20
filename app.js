@@ -133,9 +133,14 @@ function recordTime(stepNumber) {
 function checkAutoSave() {
     if (lastCompletedStep === 10 && !localStorage.getItem("routineSaved")) {
         localStorage.setItem("routineSaved", "true");
-        saveToHistory();
+
+        // ⏳ Laisser le cycle JS se terminer avant sauvegarde
+        setTimeout(() => {
+            saveToHistory();
+        }, 0);
     }
 }
+
 
 /* =====================
    DURATION
