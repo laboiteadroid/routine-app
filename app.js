@@ -282,3 +282,44 @@ function restoreDailyInputs() {
     document.getElementById("sleepScore").value = d.sleepScore || "";
     document.getElementById("dailyNote").value = d.dailyNote || "";
 }
+/* =====================
+   EXPORT HISTORY TO CSV
+   ===================== */
+function exportHistoryCSV() {
+
+    const history = JSON.parse(localStorage.getItem("history") || "[]");
+
+    if (history.length === 0) {
+        alert("No history to export.");
+        return;
+    }
+
+    // CSV header
+    let csv = "Date,Routine Minutes,Routine Formatted,Sleep Duration,Sleep Score,Note\n";
+
+    history.forEach(h => {
+        const row = [
+            h.date || "",
+            h.routineMinutes || "",
+            h.routineFormatted || "",
+            h.sleepTime || "",
+            h.sleepScore || "",
+            (h.note || "").replace(/"/g, '""') // escape quotes
+        ];
+
+        csv += `"${row.join('","')}"\n`;
+    });
+
+    // Create file
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `routine-history-${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
