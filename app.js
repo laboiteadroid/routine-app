@@ -323,3 +323,43 @@ function exportHistoryCSV() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 }
+/* =====================
+   LOAD HISTORY (DISPLAY)
+   ===================== */
+function loadHistory() {
+    const container = document.getElementById("history");
+    if (!container) return;
+
+    const history = JSON.parse(localStorage.getItem("history") || "[]");
+    container.innerHTML = "";
+
+    if (history.length === 0) {
+        container.innerHTML = "<p style='margin-left:15px;'>No history yet.</p>";
+        return;
+    }
+
+    history.forEach(h => {
+        const d = document.createElement("div");
+        d.className = "history-entry";
+
+        d.innerHTML = `
+            <strong>${h.date}</strong><br><br>
+            <strong>Routine:</strong> ${h.routineFormatted} (${h.routineMinutes} min)<br><br>
+            ${h.sleepTime ? `<strong>Sleep:</strong> ${h.sleepTime}<br>` : ""}
+            ${h.sleepScore ? `<strong>Score:</strong> ${h.sleepScore}<br>` : ""}
+            ${h.note ? `<br><strong>Note:</strong><br>${h.note}` : ""}
+            <hr>
+        `;
+
+        container.appendChild(d);
+    });
+}
+
+/* =====================
+   CLEAR HISTORY
+   ===================== */
+function clearHistory() {
+    if (!confirm("Clear history?")) return;
+    localStorage.removeItem("history");
+    loadHistory();
+}
