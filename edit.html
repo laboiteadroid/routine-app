@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Step Time</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+  <nav>
+    <a href="index.html">Routine</a>
+    <a href="history.html">History</a>
+    <a href="edit.html" class="active">Edit</a>
+  </nav>
+</header>
+
+<h2>Edit step time</h2>
+
+<div class="edit-container">
+
+  <label>
+    Step
+    <select id="editStep"></select>
+  </label>
+
+  <label>
+    Time (hh:mm)
+    <input type="time" id="editStepTime">
+  </label>
+
+  <button onclick="saveEdit()">Save</button>
+
+</div>
+
+<script src="app.js"></script>
+<script>
+  initEditPage();
+</script>
+
+</body>
+</html>
