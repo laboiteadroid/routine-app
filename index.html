@@ -10,8 +10,64 @@
 
     <!-- PWA manifest -->
     <link rel="manifest" href="manifest.json">
-</head>
 
+    <style>
+    /* ===================== MODAL EDIT ===================== */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.4);
+        justify-content: center;
+        align-items: center;
+        z-index: 999;
+    }
+    .modal {
+        background: #fff;
+        padding: 16px 20px;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 400px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        text-align: left;
+    }
+    .modal h3 {
+        margin-top: 0;
+        font-size: 18px;
+        margin-bottom: 12px;
+    }
+    .modal label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    .modal input, .modal select {
+        width: 100%;
+        padding: 6px 8px;
+        font-size: 14px;
+        margin-bottom: 12px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+    }
+    .modal button {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        border-radius: 8px;
+        border: none;
+        background: #4d94ff;
+        color: white;
+        cursor: pointer;
+    }
+    .modal button:hover {
+        background: #3377ff;
+    }
+    </style>
+</head>
 <body>
 
 <header>
@@ -26,105 +82,75 @@
     <div class="current-label">Current step</div>
     <div id="focusStep" class="current-value">Start wake-up</div>
 </div>
-<!-- EDIT STEP TIME -->
-<div class="edit-panel">
 
-    <div class="edit-title">
-        ⚙️ Edit step time
-    </div>
-
-    <div class="edit-row">
-        <label>
-            Step
-            <select id="editStep"></select>
-        </label>
-
-        <label>
-            Time (hh:mm)
-            <input type="time" id="editStepTime">
-        </label>
-
-        <button onclick="saveEdit()">Save</button>
-    </div>
-
+<!-- BUTTON TO OPEN EDIT MODAL -->
+<div style="margin: 12px 15px;">
+    <button onclick="openEdit()" style="font-size:14px;">⚙️ Edit step time</button>
 </div>
 
 <!-- STEPS -->
 <div class="step-list">
-
     <div class="step" onclick="recordTime(1)">
         <span id="label-1">Start wake-up</span>
         <span id="time-1" class="time"></span>
     </div>
-
     <div class="step" onclick="recordTime(2)">
         <span id="label-2">Out of bed</span>
         <span id="time-2" class="time"></span>
         <span id="delta-2" class="delta"></span>
     </div>
-
     <div class="step" onclick="recordTime(3)">
         <span id="label-3">In Bathroom</span>
         <span id="time-3" class="time"></span>
         <span id="delta-3" class="delta"></span>
     </div>
-
     <div class="step" onclick="recordTime(4)">
         <span id="label-4">Finished ready</span>
         <span id="time-4" class="time"></span>
         <span id="delta-4" class="delta"></span>
     </div>
-
     <div class="step" onclick="recordTime(5)">
         <span id="label-5">In kitchen</span>
         <span id="time-5" class="time"></span>
         <span id="delta-5" class="delta"></span>
     </div>
-
     <div class="step" onclick="recordTime(6)">
         <span id="label-6">Sitting down for breakfast</span>
         <span id="time-6" class="time"></span>
         <span id="delta-6" class="delta"></span>
     </div>
-
     <div class="step" onclick="recordTime(7)">
         <span id="label-7">Finish eating</span>
         <span id="time-7" class="time"></span>
         <span id="delta-7" class="delta"></span>
     </div>
-
     <div class="step" onclick="recordTime(8)">
         <span id="label-8">In Bathroom teeth</span>
         <span id="time-8" class="time"></span>
         <span id="delta-8" class="delta"></span>
     </div>
-
     <div class="step" onclick="recordTime(9)">
         <span id="label-9">Finish brushing teeth</span>
         <span id="time-9" class="time"></span>
         <span id="delta-9" class="delta"></span>
     </div>
-
     <div class="step" onclick="recordTime(10)">
         <span id="label-10">Out of bathroom - Kitchen</span>
         <span id="time-10" class="time"></span>
         <span id="delta-10" class="delta"></span>
     </div>
-
 </div>
 
 <!-- DAILY INPUTS -->
 <div class="daily-inputs">
-
     <label for="sleepTime" class="sleep-label">Sleep duration</label>
-    <input type="time" id="sleepTime" aria-label="Sleep duration">
+    <input type="time" id="sleepTime">
 
     <label for="sleepScore" class="sleep-label">Sleep score</label>
     <input type="number" id="sleepScore" min="0" max="100">
 
     <label for="dailyNote" class="sleep-label">Daily note</label>
     <textarea id="dailyNote" rows="2"></textarea>
-
 </div>
 
 <!-- ACTION BUTTONS -->
@@ -133,8 +159,36 @@
     <button onclick="saveToHistory()">Save to history</button>
 </div>
 
+<!-- ===================== EDIT MODAL ===================== -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal">
+        <h3>Edit step time</h3>
+        <label>
+            Step
+            <select id="editStep"></select>
+        </label>
+        <label>
+            Time (hh:mm)
+            <input type="time" id="editStepTime">
+        </label>
+        <button onclick="saveEditAndClose()">Save</button>
+    </div>
+</div>
+
 <!-- App logic -->
 <script src="app.js"></script>
+<script>
+function openEdit() {
+    document.getElementById("editModal").style.display = "flex";
+}
+function closeEdit() {
+    document.getElementById("editModal").style.display = "none";
+}
+function saveEditAndClose() {
+    saveEdit();
+    closeEdit();
+}
+</script>
 
 <!-- Service worker -->
 <script>
