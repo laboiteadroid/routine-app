@@ -322,3 +322,34 @@ button {
     min-height: 48px;     /* 👈 zone tactile confortable */
     padding: 8px 12px;
 }
+.edit-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.edit-modal.hidden {
+    display: none;
+}
+
+.edit-box {
+    background: white;
+    padding: 16px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 420px;
+}
+
+.edit-box label {
+    display: block;
+    margin-bottom: 12px;
+}
+
+.edit-actions {
+    display: flex;
+    justify-content: space-between;
+}
