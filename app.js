@@ -1,5 +1,5 @@
 /***********************
- * Routine App JS v6
+ * Routine App JS v5 Modal
  ************************/
 
 /* =====================
@@ -45,7 +45,7 @@ window.addEventListener("load", () => {
   updateUI();
   updateCurrentStep();
   restoreDeltas();
-  initEditPanel();
+  initEditModal();
   checkAutoSave();
 
   ["sleepTime", "sleepScore", "dailyNote"].forEach(id => {
@@ -98,7 +98,7 @@ function recordTime(stepNumber) {
   updateUI();
   updateCurrentStep();
   restoreDeltas();
-  initEditPanel();
+  initEditModal();
   checkAutoSave();
 }
 
@@ -155,23 +155,20 @@ function restoreDeltas() {
 }
 
 /* =====================
-   EDIT MODAL
+   MODAL EDIT PANEL
    ===================== */
-function openEdit() {
-  initEditPanel();
-  document.getElementById("editModal").classList.remove("hidden");
-}
-
-function closeEdit() {
-  document.getElementById("editModal").classList.add("hidden");
-}
-
-function initEditPanel() {
+function initEditModal() {
+  const modal = document.getElementById("editModal");
   const select = document.getElementById("editStep");
-  if (!select) return;
+  const input = document.getElementById("editStepTime");
+  const saveBtn = document.getElementById("saveEditBtn");
+  const openBtn = document.getElementById("openEditModalBtn");
+  const closeBtn = document.getElementById("closeEditModalBtn");
 
+  if (!modal || !select || !input || !saveBtn || !openBtn || !closeBtn) return;
+
+  // Populate select
   select.innerHTML = "";
-
   for (let i = 1; i <= lastCompletedStep; i++) {
     const opt = document.createElement("option");
     opt.value = i;
@@ -179,42 +176,49 @@ function initEditPanel() {
     select.appendChild(opt);
   }
 
-  select.onchange = loadEditTime;
   loadEditTime();
+
+  select.addEventListener("change", loadEditTime);
+
+  // Open modal
+  openBtn.onclick = () => modal.style.display = "flex";
+
+  // Close modal
+  closeBtn.onclick = () => modal.style.display = "none";
+
+  // Save changes
+  saveBtn.onclick = () => {
+    const step = Number(select.value);
+    const timeVal = input.value;
+    if (!step || !timeVal) return;
+
+    const [h, m] = timeVal.split(":");
+    steps[step] = `${h} h ${m}`;
+    localStorage.setItem("currentRoutine", JSON.stringify(steps));
+
+    updateUI();
+    restoreDeltas();
+    updateCurrentStep();
+
+    modal.style.display = "none";
+  };
+
+  // Close modal if click outside
+  window.onclick = e => {
+    if (e.target === modal) modal.style.display = "none";
+  };
 }
 
 function loadEditTime() {
-  const step = Number(document.getElementById("editStep").value);
+  const step = Number(document.getElementById("editStep")?.value);
   const input = document.getElementById("editStepTime");
-
-  if (!steps[step]) {
+  if (!step || !steps[step]) {
     input.value = "";
     return;
   }
-
   const t = parseFrenchTime(steps[step]);
   if (!t) return;
-
-  input.value =
-    t.hour.toString().padStart(2, "0") +
-    ":" +
-    t.minute.toString().padStart(2, "0");
-}
-
-function saveEdit() {
-  const step = Number(document.getElementById("editStep").value);
-  const value = document.getElementById("editStepTime").value;
-  if (!value) return;
-
-  const [h, m] = value.split(":");
-  steps[step] = `${h} h ${m}`;
-
-  localStorage.setItem("currentRoutine", JSON.stringify(steps));
-
-  updateUI();
-  restoreDeltas();
-  updateCurrentStep();
-  closeEdit();
+  input.value = t.hour.toString().padStart(2, "0") + ":" + t.minute.toString().padStart(2, "0");
 }
 
 /* =====================
@@ -225,7 +229,10 @@ function saveToHistory() {
 
   history.unshift({
     date: new Date().toLocaleDateString(),
-    steps: [...steps]
+    steps: [...steps],
+    sleepTime: document.getElementById("sleepTime").value || "",
+    sleepScore: document.getElementById("sleepScore").value || "",
+    note: document.getElementById("dailyNote").value || ""
   });
 
   localStorage.setItem("history", JSON.stringify(history));
@@ -245,7 +252,7 @@ function resetRoutine() {
 
   updateUI();
   updateCurrentStep();
-  initEditPanel();
+  initEditModal();
 
   for (let i = 2; i <= 10; i++) {
     const el = document.getElementById(`delta-${i}`);
@@ -262,9 +269,9 @@ function resetRoutine() {
    ===================== */
 function saveDailyInputs() {
   localStorage.setItem("dailyInputs", JSON.stringify({
-    sleepTime: sleepTime.value,
-    sleepScore: sleepScore.value,
-    dailyNote: dailyNote.value
+    sleepTime: document.getElementById("sleepTime").value,
+    sleepScore: document.getElementById("sleepScore").value,
+    dailyNote: document.getElementById("dailyNote").value
   }));
 }
 
@@ -273,7 +280,7 @@ function restoreDailyInputs() {
   if (!saved) return;
 
   const d = JSON.parse(saved);
-  sleepTime.value = d.sleepTime || "";
-  sleepScore.value = d.sleepScore || "";
-  dailyNote.value = d.dailyNote || "";
+  document.getElementById("sleepTime").value = d.sleepTime || "";
+  document.getElementById("sleepScore").value = d.sleepScore || "";
+  document.getElementById("dailyNote").value = d.dailyNote || "";
 }
