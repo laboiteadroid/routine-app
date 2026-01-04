@@ -363,3 +363,54 @@ function clearHistory() {
     localStorage.removeItem("history");
     loadHistory();
 }
+/* =====================
+   EDIT PAGE (TIME ONLY)
+   ===================== */
+
+function initEditPage() {
+    const select = document.getElementById("editStep");
+    if (!select) return;
+
+    const stepsData = JSON.parse(localStorage.getItem("currentRoutine") || "[]");
+
+    select.innerHTML = "";
+
+    for (let i = 1; i <= 10; i++) {
+        const opt = document.createElement("option");
+        opt.value = i;
+        opt.textContent = `${i}. ${stepNames[i]}`;
+        select.appendChild(opt);
+    }
+
+    select.addEventListener("change", loadEditTime);
+    loadEditTime();
+}
+
+function loadEditTime() {
+    const i = document.getElementById("editStep").value;
+    const stepsData = JSON.parse(localStorage.getItem("currentRoutine") || "[]");
+
+    if (stepsData[i]) {
+        document.getElementById("editStepTime").value =
+            stepsData[i].replace(" h ", ":");
+    } else {
+        document.getElementById("editStepTime").value = "";
+    }
+}
+
+function saveEdit() {
+    const i = document.getElementById("editStep").value;
+    const newTime = document.getElementById("editStepTime").value;
+
+    if (!newTime) {
+        alert("Please enter a time");
+        return;
+    }
+
+    const stepsData = JSON.parse(localStorage.getItem("currentRoutine") || "[]");
+
+    stepsData[i] = newTime.replace(":", " h ");
+    localStorage.setItem("currentRoutine", JSON.stringify(stepsData));
+
+    alert("Time updated ✔");
+                                                      }
