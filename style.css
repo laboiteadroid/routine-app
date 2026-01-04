@@ -314,3 +314,11 @@ header nav a.active {
     flex-direction: column;
     font-size: 13px;
 }
+/* FORCE MOBILE FRIENDLY FOR EDIT SELECT */
+select,
+input[type="time"],
+button {
+    font-size: 18px;      /* 👈 plus gros que 16 */
+    min-height: 48px;     /* 👈 zone tactile confortable */
+    padding: 8px 12px;
+}
