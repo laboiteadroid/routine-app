@@ -413,4 +413,39 @@ function saveEdit() {
     localStorage.setItem("currentRoutine", JSON.stringify(stepsData));
 
     alert("Time updated ✔");
-                                                      }
+   function recalculateAllDeltas() {
+    for (let i = 2; i <= 10; i++) {
+        const el = document.getElementById(`delta-${i}`);
+        if (!el) continue;
+
+        if (!steps[i] || !steps[i - 1]) {
+            el.textContent = "";
+            continue;
+        }
+
+        const a = parseFrenchTime(steps[i - 1]);
+        const b = parseFrenchTime(steps[i]);
+
+        let s = new Date();
+        let e = new Date();
+
+        s.setHours(a.hour, a.minute, 0);
+        e.setHours(b.hour, b.minute, 0);
+
+        let diff = e - s;
+
+        // 🕛 Passage minuit
+        if (diff < 0) diff += 24 * 60 * 60 * 1000;
+
+        // Sécurité
+        if (diff < 0 || diff > 6 * 60 * 60 * 1000) {
+            el.textContent = "";
+            continue;
+        }
+
+        const m = Math.floor(diff / 60000);
+        const sec = Math.floor((diff % 60000) / 1000);
+
+        el.textContent = `${m}m ${sec}s`;
+    }
+   }                                                   }
