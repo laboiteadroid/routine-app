@@ -26,6 +26,28 @@
     <div class="current-label">Current step</div>
     <div id="focusStep" class="current-value">Start wake-up</div>
 </div>
+<!-- EDIT STEP TIME -->
+<div class="edit-panel">
+
+    <div class="edit-title">
+        ⚙️ Edit step time
+    </div>
+
+    <div class="edit-row">
+        <label>
+            Step
+            <select id="editStep"></select>
+        </label>
+
+        <label>
+            Time (hh:mm)
+            <input type="time" id="editStepTime">
+        </label>
+
+        <button onclick="saveEdit()">Save</button>
+    </div>
+
+</div>
 
 <!-- STEPS -->
 <div class="step-list">
