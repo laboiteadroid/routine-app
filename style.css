@@ -282,3 +282,35 @@ header nav a.active {
         border-bottom: 1px solid #ccc;
     }
 }
+/* =====================
+   EDIT PANEL (MOBILE FRIENDLY)
+   ===================== */
+
+.edit-panel {
+    margin: 12px;
+    padding: 10px;
+    border-radius: 10px;
+    background: #eef4fb;
+}
+
+.edit-panel select,
+.edit-panel input[type="time"],
+.edit-panel button {
+    font-size: 16px;          /* 👈 clé pour mobile */
+    min-height: 44px;         /* 👈 standard tactile Apple / Android */
+    padding: 6px 10px;
+    border-radius: 8px;
+}
+
+.edit-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.edit-row label {
+    display: flex;
+    flex-direction: column;
+    font-size: 13px;
+}
