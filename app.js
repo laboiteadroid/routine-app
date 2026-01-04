@@ -1,5 +1,5 @@
 /***********************
- * Routine App JS v5 Modal
+ * Routine App JS v5 MODAL EDIT
  ************************/
 
 /* =====================
@@ -30,6 +30,7 @@ const stepNames = [
    ===================== */
 window.addEventListener("load", () => {
 
+  // Restore routine
   const saved = localStorage.getItem("currentRoutine");
   if (saved) {
     steps = JSON.parse(saved);
@@ -69,6 +70,12 @@ function nowFormatted() {
     minute: "2-digit",
     hour12: false
   }).replace(":", " h ");
+}
+
+function minutesToHours(min) {
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  return `${h.toString().padStart(2, "0")} h ${m.toString().padStart(2, "0")} min`;
 }
 
 /* =====================
@@ -155,70 +162,53 @@ function restoreDeltas() {
 }
 
 /* =====================
-   MODAL EDIT PANEL
+   EDIT MODAL
    ===================== */
 function initEditModal() {
-  const modal = document.getElementById("editModal");
   const select = document.getElementById("editStep");
-  const input = document.getElementById("editStepTime");
-  const saveBtn = document.getElementById("saveEditBtn");
-  const openBtn = document.getElementById("openEditModalBtn");
-  const closeBtn = document.getElementById("closeEditModalBtn");
+  if (!select) return;
 
-  if (!modal || !select || !input || !saveBtn || !openBtn || !closeBtn) return;
-
-  // Populate select
   select.innerHTML = "";
-  for (let i = 1; i <= lastCompletedStep; i++) {
+  for (let i = 1; i <= 10; i++) {
     const opt = document.createElement("option");
     opt.value = i;
     opt.textContent = `${i} – ${stepNames[i]}`;
+    if (!steps[i]) opt.disabled = true; // désactiver les étapes non complétées
     select.appendChild(opt);
   }
 
-  loadEditTime();
-
   select.addEventListener("change", loadEditTime);
-
-  // Open modal
-  openBtn.onclick = () => modal.style.display = "flex";
-
-  // Close modal
-  closeBtn.onclick = () => modal.style.display = "none";
-
-  // Save changes
-  saveBtn.onclick = () => {
-    const step = Number(select.value);
-    const timeVal = input.value;
-    if (!step || !timeVal) return;
-
-    const [h, m] = timeVal.split(":");
-    steps[step] = `${h} h ${m}`;
-    localStorage.setItem("currentRoutine", JSON.stringify(steps));
-
-    updateUI();
-    restoreDeltas();
-    updateCurrentStep();
-
-    modal.style.display = "none";
-  };
-
-  // Close modal if click outside
-  window.onclick = e => {
-    if (e.target === modal) modal.style.display = "none";
-  };
+  loadEditTime();
 }
 
 function loadEditTime() {
-  const step = Number(document.getElementById("editStep")?.value);
+  const step = Number(document.getElementById("editStep").value);
   const input = document.getElementById("editStepTime");
-  if (!step || !steps[step]) {
+
+  if (!steps[step]) {
     input.value = "";
     return;
   }
+
   const t = parseFrenchTime(steps[step]);
   if (!t) return;
+
   input.value = t.hour.toString().padStart(2, "0") + ":" + t.minute.toString().padStart(2, "0");
+}
+
+function saveEdit() {
+  const step = Number(document.getElementById("editStep").value);
+  const input = document.getElementById("editStepTime").value;
+  if (!input) return;
+
+  const [h, m] = input.split(":");
+  steps[step] = `${h} h ${m}`;
+
+  localStorage.setItem("currentRoutine", JSON.stringify(steps));
+
+  updateUI();
+  restoreDeltas();
+  updateCurrentStep();
 }
 
 /* =====================
