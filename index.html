@@ -1,146 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Routine App</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>Routine</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Styles -->
-    <link rel="stylesheet" href="style.css">
-
-    <!-- PWA manifest -->
-    <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
 </head>
 
 <body>
 
 <header>
-    <nav>
-  <a href="index.html" class="active">Routine</a>
-  <a href="history.html">History</a>
-  <a href="edit.html">Edit</a>
-</nav>
+  <nav>
+    <a href="index.html" class="active">Routine</a>
+    <a href="history.html">History</a>
+  </nav>
 </header>
 
-<!-- CURRENT STEP -->
-<div class="current-step">
-    <div class="current-label">Current step</div>
-    <div id="focusStep" class="current-value">Start wake-up</div>
+<h2 id="focusStep"></h2>
+
+<!-- ROUTINE STEPS -->
+<div id="steps">
+  <!-- Les étapes sont déjà dans ton HTML/CSS existant -->
 </div>
 
-<!-- STEPS -->
-<div class="step-list">
+<hr>
 
-    <div class="step" onclick="recordTime(1)">
-        <span id="label-1" class="label">Start wake-up</span>
-        <span id="time-1" class="time"></span>
-    </div>
+<!-- ⚙️ EDIT PANEL -->
+<div class="edit-container">
+  <h3>⚙️ Edit step time</h3>
 
-    <div class="step" onclick="recordTime(2)">
-        <span id="label-2" class="label">Out of bed</span>
-        <span id="time-2" class="time"></span>
-        <span id="delta-2" class="delta"></span>
-    </div>
+  <label>
+    Step
+    <select id="editStep"></select>
+  </label>
 
-    <div class="step" onclick="recordTime(3)">
-        <span id="label-3" class="label">In Bathroom</span>
-        <span id="time-3" class="time"></span>
-        <span id="delta-3" class="delta"></span>
-    </div>
+  <label>
+    Time (hh:mm)
+    <input type="time" id="editStepTime">
+  </label>
 
-    <div class="step" onclick="recordTime(4)">
-        <span id="label-4" class="label">Finished ready</span>
-        <span id="time-4" class="time"></span>
-        <span id="delta-4" class="delta"></span>
-    </div>
-
-    <div class="step" onclick="recordTime(5)">
-        <span id="label-5" class="label">In kitchen</span>
-        <span id="time-5" class="time"></span>
-        <span id="delta-5" class="delta"></span>
-    </div>
-
-    <div class="step" onclick="recordTime(6)">
-        <span id="label-6" class="label">Sitting down for breakfast</span>
-        <span id="time-6" class="time"></span>
-        <span id="delta-6" class="delta"></span>
-    </div>
-
-    <div class="step" onclick="recordTime(7)">
-        <span id="label-7" class="label">Finish eating</span>
-        <span id="time-7" class="time"></span>
-        <span id="delta-7" class="delta"></span>
-    </div>
-
-    <div class="step" onclick="recordTime(8)">
-        <span id="label-8" class="label">In Bathroom teeth</span>
-        <span id="time-8" class="time"></span>
-        <span id="delta-8" class="delta"></span>
-    </div>
-
-    <div class="step" onclick="recordTime(9)">
-        <span id="label-9" class="label">Finish brushing teeth</span>
-        <span id="time-9" class="time"></span>
-        <span id="delta-9" class="delta"></span>
-    </div>
-
-    <div class="step" onclick="recordTime(10)">
-        <span id="label-10" class="label">Out of bathroom - Kitchen</span>
-        <span id="time-10" class="time"></span>
-        <span id="delta-10" class="delta"></span>
-    </div>
-
+  <button onclick="saveEdit()">Save</button>
 </div>
 
 <!-- DAILY INPUTS -->
-<div class="daily-inputs">
+<hr>
 
-    <!-- Sleep row -->
-    <div class="sleep-row">
+<label>Sleep time
+  <input id="sleepTime" type="time">
+</label>
 
-        <div class="sleep-duration">
-            <label for="sleepTime">Sleep duration</label>
-            <input type="time" id="sleepTime">
-        </div>
+<label>Sleep score
+  <input id="sleepScore" type="number">
+</label>
 
-        <div class="sleep-score">
-            <label for="sleepScore">Score</label>
-            <input
-                type="number"
-                id="sleepScore"
-                min="0"
-                max="100"
-                placeholder="--">
-        </div>
+<label>Note
+  <textarea id="dailyNote"></textarea>
+</label>
 
-    </div>
-
-    <!-- Daily note -->
-    <div class="daily-note">
-        <label for="dailyNote">Daily note</label>
-        <textarea
-            id="dailyNote"
-            rows="2"
-            placeholder="Optional"></textarea>
-    </div>
-
-</div>
-
-<!-- ACTION BUTTONS -->
-<div class="action-buttons">
-    <button onclick="showTotalDuration()">Show total duration</button>
-    <button onclick="saveToHistory()">Save to history</button>
-</div>
-
-<!-- App logic -->
 <script src="app.js"></script>
-
-<!-- Service worker -->
-<script>
-if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("service-worker.js");
-}
-</script>
-
 </body>
 </html>
