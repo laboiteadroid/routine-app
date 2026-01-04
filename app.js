@@ -244,3 +244,56 @@ function restoreDailyInputs() {
   sleepScore.value = d.sleepScore || "";
   dailyNote.value = d.dailyNote || "";
 }
+/* =====================
+   EDIT STEP TIME
+   ===================== */
+
+function initEditPanel() {
+    const select = document.getElementById("editStep");
+    if (!select) return;
+
+    select.innerHTML = "";
+
+    for (let i = 1; i <= 10; i++) {
+        const opt = document.createElement("option");
+        opt.value = i;
+        opt.textContent = `${i} – ${stepNames[i]}`;
+        select.appendChild(opt);
+    }
+
+    select.addEventListener("change", loadEditTime);
+    loadEditTime();
+}
+
+function loadEditTime() {
+    const step = Number(document.getElementById("editStep").value);
+    const input = document.getElementById("editStepTime");
+
+    if (!steps[step]) {
+        input.value = "";
+        return;
+    }
+
+    const t = parseFrenchTime(steps[step]);
+    if (!t) return;
+
+    input.value =
+        t.hour.toString().padStart(2, "0") +
+        ":" +
+        t.minute.toString().padStart(2, "0");
+}
+
+function saveEdit() {
+    const step = Number(document.getElementById("editStep").value);
+    const input = document.getElementById("editStepTime").value;
+    if (!input) return;
+
+    const [h, m] = input.split(":");
+
+    steps[step] = `${h} h ${m}`;
+    localStorage.setItem("currentRoutine", JSON.stringify(steps));
+
+    updateUI();
+    restoreDeltas();
+    updateCurrentStep();
+}
