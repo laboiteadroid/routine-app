@@ -269,3 +269,42 @@ function restoreDailyInputs() {
   if (document.getElementById("sleepScore")) document.getElementById("sleepScore").value = d.sleepScore || "";
   if (document.getElementById("dailyNote")) document.getElementById("dailyNote").value = d.dailyNote || "";
 }
+/* =====================
+   MODAL OPEN / CLOSE
+   ===================== */
+function openEditModal() {
+  const modal = document.getElementById("editModal");
+  if (modal) modal.style.display = "block";
+}
+
+function closeEditModal() {
+  const modal = document.getElementById("editModal");
+  if (modal) modal.style.display = "none";
+}
+
+/* =====================
+   TOTAL DURATION
+   ===================== */
+function showTotalDuration() {
+  if (!steps[1] || !steps[lastCompletedStep]) {
+    alert("Not enough data to calculate duration.");
+    return;
+  }
+
+  const start = parseFrenchTime(steps[1]);
+  const end = parseFrenchTime(steps[lastCompletedStep]);
+
+  const s = new Date();
+  const e = new Date();
+  s.setHours(start.hour, start.minute, 0);
+  e.setHours(end.hour, end.minute, 0);
+
+  let diff = e - s;
+  if (diff < 0) diff += 86400000;
+
+  const mins = Math.floor(diff / 60000);
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+
+  alert(`Total routine duration: ${h} h ${m} min`);
+  }
