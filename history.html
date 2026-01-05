@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,20 +10,14 @@
 
     <style>
     @media print {
-
       body {
         font-size: 9px;
         line-height: 1.15;
         margin: 8mm;
       }
-    h2 {
-    display: none !important;
-      }
-      header, nav, button {
+      h2, header, nav, button {
         display: none !important;
       }
-
-      
 
       #history {
         column-count: 2;
@@ -64,10 +57,12 @@
     <button onclick="clearHistory()">Clear history</button>
 </div>
 
+<!-- ✅ CONTENEUR MANQUANT -->
+<div id="history"></div>
+
 <!-- Logique principale -->
 <script src="app.js"></script>
 
-<!-- Charger l'historique -->
 <script>
   loadHistory();
 </script>
