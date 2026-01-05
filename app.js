@@ -1,5 +1,5 @@
 /***********************
- * Routine App JS v5.1 FINAL MODALE
+ * Routine App JS v5.1
  ************************/
 
 /* =====================
@@ -145,7 +145,7 @@ function restoreDeltas() {
     e.setHours(b.hour, b.minute, 0);
 
     let diff = e - s;
-    if (diff < 0) diff += 86400000; // Passage minuit
+    if (diff < 0) diff += 86400000; // passage minuit
 
     const m = Math.floor(diff / 60000);
     const el = document.getElementById(`delta-${i}`);
@@ -184,10 +184,7 @@ function loadEditTime() {
   const t = parseFrenchTime(steps[step]);
   if (!t) return;
 
-  input.value =
-    t.hour.toString().padStart(2, "0") +
-    ":" +
-    t.minute.toString().padStart(2, "0");
+  input.value = `${t.hour.toString().padStart(2, "0")}:${t.minute.toString().padStart(2, "0")}`;
 }
 
 function saveEdit() {
@@ -197,32 +194,30 @@ function saveEdit() {
 
   const [h, m] = input.split(":");
   steps[step] = `${h} h ${m}`;
-
   localStorage.setItem("currentRoutine", JSON.stringify(steps));
 
   updateUI();
   restoreDeltas();
   updateCurrentStep();
-  initEditModal();
-  closeEditModal();
 }
 
 /* =====================
    HISTORY
    ===================== */
 function saveToHistory() {
-  const history = JSON.parse(localStorage.getItem("history") || "[]");
+  saveDailyInputs(); // ✅ s'assurer que les inputs sont à jour
 
-  const sleepTime = document.getElementById("sleepTime")?.value || "";
-  const sleepScore = document.getElementById("sleepScore")?.value || "";
-  const note = document.getElementById("dailyNote")?.value || "";
+  const hasStep = steps.some(s => s);
+  if (!hasStep) return;
+
+  const history = JSON.parse(localStorage.getItem("history") || "[]");
 
   history.unshift({
     date: new Date().toLocaleDateString(),
     steps: [...steps],
-    sleepTime,
-    sleepScore,
-    note
+    sleepTime: document.getElementById("sleepTime")?.value || "",
+    sleepScore: document.getElementById("sleepScore")?.value || "",
+    note: document.getElementById("dailyNote")?.value || ""
   });
 
   localStorage.setItem("history", JSON.stringify(history));
@@ -259,9 +254,9 @@ function resetRoutine() {
    ===================== */
 function saveDailyInputs() {
   localStorage.setItem("dailyInputs", JSON.stringify({
-    sleepTime: document.getElementById("sleepTime").value || "",
-    sleepScore: document.getElementById("sleepScore").value || "",
-    dailyNote: document.getElementById("dailyNote").value || ""
+    sleepTime: document.getElementById("sleepTime")?.value || "",
+    sleepScore: document.getElementById("sleepScore")?.value || "",
+    dailyNote: document.getElementById("dailyNote")?.value || ""
   }));
 }
 
@@ -270,18 +265,7 @@ function restoreDailyInputs() {
   if (!saved) return;
 
   const d = JSON.parse(saved);
-  document.getElementById("sleepTime").value = d.sleepTime || "";
-  document.getElementById("sleepScore").value = d.sleepScore || "";
-  document.getElementById("dailyNote").value = d.dailyNote || "";
-}
-
-/* =====================
-   MODAL HANDLERS
-   ===================== */
-function openEditModal() {
-  document.getElementById("editModal").style.display = "block";
-}
-
-function closeEditModal() {
-  document.getElementById("editModal").style.display = "none";
+  if (document.getElementById("sleepTime")) document.getElementById("sleepTime").value = d.sleepTime || "";
+  if (document.getElementById("sleepScore")) document.getElementById("sleepScore").value = d.sleepScore || "";
+  if (document.getElementById("dailyNote")) document.getElementById("dailyNote").value = d.dailyNote || "";
 }
