@@ -56,17 +56,13 @@
 
 <!-- ACTION BUTTONS -->
 <div class="action-buttons">
-    <button onclick="exportHistoryCSV()">Export CSV</button>
+    <button onclick="exportHistoryCSV()">CSV</button>
+    <button onclick="window.print()">🖨️ Print</button>
 </div>
 
-<h2>Routine History</h2>
-
-<div style="margin-left: 15px;">
-    <button onclick="window.print()">Print history</button>
+<div class="action-buttons danger">
     <button onclick="clearHistory()">Clear history</button>
 </div>
-
-<div id="history"></div>
 
 <!-- Logique principale -->
 <script src="app.js"></script>
