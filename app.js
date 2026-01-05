@@ -328,3 +328,34 @@ function restoreDailyInputs() {
   sleepScore.value = d.sleepScore || "";
   dailyNote.value = d.dailyNote || "";
 }
+/* =====================
+   TOTAL DURATION
+   ===================== */
+function showTotalDuration() {
+  let totalMinutes = 0;
+
+  for (let i = 2; i <= 10; i++) {
+    const start = parseFrenchTime(steps[i - 1]);
+    const end = parseFrenchTime(steps[i]);
+    if (!start || !end) continue;
+
+    const s = new Date();
+    const e = new Date();
+    s.setHours(start.hour, start.minute, 0);
+    e.setHours(end.hour, end.minute, 0);
+
+    let diff = e - s;
+    if (diff < 0) diff += 86400000; // passage de minuit
+
+    totalMinutes += Math.floor(diff / 60000);
+  }
+
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  let msg = "Total routine duration:\n";
+  if (hours > 0) msg += `${hours} h `;
+  msg += `${minutes} min`;
+
+  alert(msg);
+}
