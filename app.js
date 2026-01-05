@@ -1,5 +1,5 @@
 /***********************
- * Routine App JS v5 MODAL EDIT
+ * Routine App JS v5.1 FINAL MODALE
  ************************/
 
 /* =====================
@@ -29,8 +29,6 @@ const stepNames = [
    INIT
    ===================== */
 window.addEventListener("load", () => {
-
-  // Restore routine
   const saved = localStorage.getItem("currentRoutine");
   if (saved) {
     steps = JSON.parse(saved);
@@ -70,12 +68,6 @@ function nowFormatted() {
     minute: "2-digit",
     hour12: false
   }).replace(":", " h ");
-}
-
-function minutesToHours(min) {
-  const h = Math.floor(min / 60);
-  const m = min % 60;
-  return `${h.toString().padStart(2, "0")} h ${m.toString().padStart(2, "0")} min`;
 }
 
 /* =====================
@@ -153,7 +145,7 @@ function restoreDeltas() {
     e.setHours(b.hour, b.minute, 0);
 
     let diff = e - s;
-    if (diff < 0) diff += 86400000;
+    if (diff < 0) diff += 86400000; // Passage minuit
 
     const m = Math.floor(diff / 60000);
     const el = document.getElementById(`delta-${i}`);
@@ -169,11 +161,10 @@ function initEditModal() {
   if (!select) return;
 
   select.innerHTML = "";
-  for (let i = 1; i <= 10; i++) {
+  for (let i = 1; i <= lastCompletedStep; i++) {
     const opt = document.createElement("option");
     opt.value = i;
     opt.textContent = `${i} – ${stepNames[i]}`;
-    if (!steps[i]) opt.disabled = true; // désactiver les étapes non complétées
     select.appendChild(opt);
   }
 
@@ -193,7 +184,10 @@ function loadEditTime() {
   const t = parseFrenchTime(steps[step]);
   if (!t) return;
 
-  input.value = t.hour.toString().padStart(2, "0") + ":" + t.minute.toString().padStart(2, "0");
+  input.value =
+    t.hour.toString().padStart(2, "0") +
+    ":" +
+    t.minute.toString().padStart(2, "0");
 }
 
 function saveEdit() {
@@ -209,6 +203,8 @@ function saveEdit() {
   updateUI();
   restoreDeltas();
   updateCurrentStep();
+  initEditModal();
+  closeEditModal();
 }
 
 /* =====================
@@ -217,12 +213,16 @@ function saveEdit() {
 function saveToHistory() {
   const history = JSON.parse(localStorage.getItem("history") || "[]");
 
+  const sleepTime = document.getElementById("sleepTime")?.value || "";
+  const sleepScore = document.getElementById("sleepScore")?.value || "";
+  const note = document.getElementById("dailyNote")?.value || "";
+
   history.unshift({
     date: new Date().toLocaleDateString(),
     steps: [...steps],
-    sleepTime: document.getElementById("sleepTime").value || "",
-    sleepScore: document.getElementById("sleepScore").value || "",
-    note: document.getElementById("dailyNote").value || ""
+    sleepTime,
+    sleepScore,
+    note
   });
 
   localStorage.setItem("history", JSON.stringify(history));
@@ -259,9 +259,9 @@ function resetRoutine() {
    ===================== */
 function saveDailyInputs() {
   localStorage.setItem("dailyInputs", JSON.stringify({
-    sleepTime: document.getElementById("sleepTime").value,
-    sleepScore: document.getElementById("sleepScore").value,
-    dailyNote: document.getElementById("dailyNote").value
+    sleepTime: document.getElementById("sleepTime").value || "",
+    sleepScore: document.getElementById("sleepScore").value || "",
+    dailyNote: document.getElementById("dailyNote").value || ""
   }));
 }
 
@@ -273,4 +273,15 @@ function restoreDailyInputs() {
   document.getElementById("sleepTime").value = d.sleepTime || "";
   document.getElementById("sleepScore").value = d.sleepScore || "";
   document.getElementById("dailyNote").value = d.dailyNote || "";
+}
+
+/* =====================
+   MODAL HANDLERS
+   ===================== */
+function openEditModal() {
+  document.getElementById("editModal").style.display = "block";
+}
+
+function closeEditModal() {
+  document.getElementById("editModal").style.display = "none";
 }
