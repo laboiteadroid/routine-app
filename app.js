@@ -1,5 +1,5 @@
 /***********************
- * Routine App JS v5.2 STABLE
+ * Routine App JS v5.3 FINAL
  ************************/
 
 /* =====================
@@ -29,8 +29,6 @@ const stepNames = [
    INIT
    ===================== */
 window.addEventListener("load", () => {
-
-  // Restore routine
   const saved = localStorage.getItem("currentRoutine");
   if (saved) {
     steps = JSON.parse(saved);
@@ -148,6 +146,31 @@ function restoreDeltas() {
 }
 
 /* =====================
+   TOTAL DURATION (CORE)
+   ===================== */
+function calculateTotalMinutes() {
+  let total = 0;
+
+  for (let i = 2; i <= 10; i++) {
+    const start = parseFrenchTime(steps[i - 1]);
+    const end = parseFrenchTime(steps[i]);
+    if (!start || !end) continue;
+
+    const s = new Date();
+    const e = new Date();
+    s.setHours(start.hour, start.minute, 0);
+    e.setHours(end.hour, end.minute, 0);
+
+    let diff = e - s;
+    if (diff < 0) diff += 86400000;
+
+    total += Math.floor(diff / 60000);
+  }
+
+  return total;
+}
+
+/* =====================
    EDIT MODAL
    ===================== */
 function openEditModal() {
@@ -218,6 +241,7 @@ function saveToHistory() {
   history.unshift({
     date: new Date().toLocaleDateString(),
     steps: [...steps],
+    totalMinutes: calculateTotalMinutes(),
     sleepTime: sleepTime.value,
     sleepScore: sleepScore.value,
     note: dailyNote.value
@@ -239,9 +263,18 @@ function loadHistory() {
     div.className = "history-entry";
 
     let html = `<strong>${h.date}</strong><br><br>`;
+
     h.steps.forEach((t, i) => {
-      if (i > 0 && t) html += `<strong>${stepNames[i]}:</strong> ${t}<br>`;
+      if (i > 0 && t) {
+        html += `<strong>${stepNames[i]}:</strong> ${t}<br>`;
+      }
     });
+
+    if (h.totalMinutes !== undefined) {
+      const hTot = Math.floor(h.totalMinutes / 60);
+      const mTot = h.totalMinutes % 60;
+      html += `<br><strong>Total routine:</strong> ${hTot ? hTot + " h " : ""}${mTot} min<br>`;
+    }
 
     if (h.sleepTime) html += `<br><strong>Sleep:</strong> ${h.sleepTime}<br>`;
     if (h.sleepScore) html += `<strong>Score:</strong> ${h.sleepScore}<br>`;
@@ -263,12 +296,12 @@ function exportHistoryCSV() {
     return;
   }
 
-  let csv = "Date,Step,Time,SleepTime,SleepScore,Note\n";
+  let csv = "Date,Step,Time,TotalMinutes,SleepTime,SleepScore,Note\n";
 
   history.forEach(h => {
     h.steps.forEach((t, i) => {
       if (i > 0 && t) {
-        csv += `"${h.date}","${stepNames[i]}","${t}","${h.sleepTime}","${h.sleepScore}","${(h.note || "").replace(/"/g,'""')}"\n`;
+        csv += `"${h.date}","${stepNames[i]}","${t}","${h.totalMinutes}","${h.sleepTime}","${h.sleepScore}","${(h.note || "").replace(/"/g,'""')}"\n`;
       }
     });
   });
@@ -327,35 +360,4 @@ function restoreDailyInputs() {
   sleepTime.value = d.sleepTime || "";
   sleepScore.value = d.sleepScore || "";
   dailyNote.value = d.dailyNote || "";
-}
-/* =====================
-   TOTAL DURATION
-   ===================== */
-function showTotalDuration() {
-  let totalMinutes = 0;
-
-  for (let i = 2; i <= 10; i++) {
-    const start = parseFrenchTime(steps[i - 1]);
-    const end = parseFrenchTime(steps[i]);
-    if (!start || !end) continue;
-
-    const s = new Date();
-    const e = new Date();
-    s.setHours(start.hour, start.minute, 0);
-    e.setHours(end.hour, end.minute, 0);
-
-    let diff = e - s;
-    if (diff < 0) diff += 86400000; // passage de minuit
-
-    totalMinutes += Math.floor(diff / 60000);
-  }
-
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-
-  let msg = "Total routine duration:\n";
-  if (hours > 0) msg += `${hours} h `;
-  msg += `${minutes} min`;
-
-  alert(msg);
 }
