@@ -1,5 +1,5 @@
 /***********************
- * Routine App JS v5.3 FINAL
+ * Routine App JS v5.3 STABLE
  ************************/
 
 /* =====================
@@ -29,6 +29,7 @@ const stepNames = [
    INIT
    ===================== */
 window.addEventListener("load", () => {
+
   const saved = localStorage.getItem("currentRoutine");
   if (saved) {
     steps = JSON.parse(saved);
@@ -148,8 +149,8 @@ function restoreDeltas() {
 /* =====================
    TOTAL DURATION (CORE)
    ===================== */
-function calculateTotalMinutes() {
-  let total = 0;
+function calculateTotalDurationMinutes() {
+  let totalMinutes = 0;
 
   for (let i = 2; i <= 10; i++) {
     const start = parseFrenchTime(steps[i - 1]);
@@ -164,10 +165,10 @@ function calculateTotalMinutes() {
     let diff = e - s;
     if (diff < 0) diff += 86400000;
 
-    total += Math.floor(diff / 60000);
+    totalMinutes += Math.floor(diff / 60000);
   }
 
-  return total;
+  return totalMinutes;
 }
 
 /* =====================
@@ -236,12 +237,16 @@ function saveEdit() {
 function saveToHistory() {
   saveDailyInputs();
 
+  const totalMinutes = calculateTotalDurationMinutes();
+  if (totalMinutes === 0) return;
+
   const history = JSON.parse(localStorage.getItem("history") || "[]");
 
   history.unshift({
     date: new Date().toLocaleDateString(),
     steps: [...steps],
-    totalMinutes: calculateTotalMinutes(),
+    totalMinutes,
+    totalFormatted: `${Math.floor(totalMinutes / 60)} h ${totalMinutes % 60} min`,
     sleepTime: sleepTime.value,
     sleepScore: sleepScore.value,
     note: dailyNote.value
@@ -262,19 +267,16 @@ function loadHistory() {
     const div = document.createElement("div");
     div.className = "history-entry";
 
-    let html = `<strong>${h.date}</strong><br><br>`;
+    let html = `<strong>${h.date}</strong><br>`;
+    if (h.totalFormatted) {
+      html += `<strong>Total routine:</strong> ${h.totalFormatted}<br><br>`;
+    }
 
     h.steps.forEach((t, i) => {
       if (i > 0 && t) {
         html += `<strong>${stepNames[i]}:</strong> ${t}<br>`;
       }
     });
-
-    if (h.totalMinutes !== undefined) {
-      const hTot = Math.floor(h.totalMinutes / 60);
-      const mTot = h.totalMinutes % 60;
-      html += `<br><strong>Total routine:</strong> ${hTot ? hTot + " h " : ""}${mTot} min<br>`;
-    }
 
     if (h.sleepTime) html += `<br><strong>Sleep:</strong> ${h.sleepTime}<br>`;
     if (h.sleepScore) html += `<strong>Score:</strong> ${h.sleepScore}<br>`;
@@ -296,12 +298,12 @@ function exportHistoryCSV() {
     return;
   }
 
-  let csv = "Date,Step,Time,TotalMinutes,SleepTime,SleepScore,Note\n";
+  let csv = "Date,TotalDuration,Step,Time,SleepTime,SleepScore,Note\n";
 
   history.forEach(h => {
     h.steps.forEach((t, i) => {
       if (i > 0 && t) {
-        csv += `"${h.date}","${stepNames[i]}","${t}","${h.totalMinutes}","${h.sleepTime}","${h.sleepScore}","${(h.note || "").replace(/"/g,'""')}"\n`;
+        csv += `"${h.date}","${h.totalFormatted}","${stepNames[i]}","${t}","${h.sleepTime}","${h.sleepScore}","${(h.note || "").replace(/"/g,'""')}"\n`;
       }
     });
   });
@@ -360,4 +362,19 @@ function restoreDailyInputs() {
   sleepTime.value = d.sleepTime || "";
   sleepScore.value = d.sleepScore || "";
   dailyNote.value = d.dailyNote || "";
+}
+
+/* =====================
+   MANUAL TOTAL (BUTTON)
+   ===================== */
+function showTotalDuration() {
+  const totalMinutes = calculateTotalDurationMinutes();
+  const h = Math.floor(totalMinutes / 60);
+  const m = totalMinutes % 60;
+
+  let msg = "Total routine duration:\n";
+  if (h > 0) msg += `${h} h `;
+  msg += `${m} min`;
+
+  alert(msg);
 }
