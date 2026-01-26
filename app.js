@@ -1,5 +1,5 @@
 /***********************
- * Routine App JS v5.3 STABLE
+ * Routine App JS v5.3 FINAL
  ************************/
 
 /* =====================
@@ -126,10 +126,13 @@ function updateUI() {
 /* =====================
    DELTAS
    ===================== */
-function restoreDeltas() {
+function computeDurations(stepArray) {
+  const durations = Array(11).fill(null);
+  let total = 0;
+
   for (let i = 2; i <= 10; i++) {
-    const a = parseFrenchTime(steps[i - 1]);
-    const b = parseFrenchTime(steps[i]);
+    const a = parseFrenchTime(stepArray[i - 1]);
+    const b = parseFrenchTime(stepArray[i]);
     if (!a || !b) continue;
 
     const s = new Date();
@@ -140,35 +143,23 @@ function restoreDeltas() {
     let diff = e - s;
     if (diff < 0) diff += 86400000;
 
-    const m = Math.floor(diff / 60000);
-    const el = document.getElementById(`delta-${i}`);
-    if (el) el.textContent = `${m} min`;
+    const minutes = Math.floor(diff / 60000);
+    durations[i] = minutes;
+    total += minutes;
   }
+
+  return { durations, total };
 }
 
-/* =====================
-   TOTAL DURATION (CORE)
-   ===================== */
-function calculateTotalDurationMinutes() {
-  let totalMinutes = 0;
+function restoreDeltas() {
+  const { durations } = computeDurations(steps);
 
   for (let i = 2; i <= 10; i++) {
-    const start = parseFrenchTime(steps[i - 1]);
-    const end = parseFrenchTime(steps[i]);
-    if (!start || !end) continue;
-
-    const s = new Date();
-    const e = new Date();
-    s.setHours(start.hour, start.minute, 0);
-    e.setHours(end.hour, end.minute, 0);
-
-    let diff = e - s;
-    if (diff < 0) diff += 86400000;
-
-    totalMinutes += Math.floor(diff / 60000);
+    const el = document.getElementById(`delta-${i}`);
+    if (el && durations[i] !== null) {
+      el.textContent = `${durations[i]} min`;
+    }
   }
-
-  return totalMinutes;
 }
 
 /* =====================
@@ -188,7 +179,6 @@ function initEditModal() {
   if (!select) return;
 
   select.innerHTML = "";
-
   for (let i = 1; i <= lastCompletedStep; i++) {
     const opt = document.createElement("option");
     opt.value = i;
@@ -237,16 +227,14 @@ function saveEdit() {
 function saveToHistory() {
   saveDailyInputs();
 
-  const totalMinutes = calculateTotalDurationMinutes();
-  if (totalMinutes === 0) return;
-
   const history = JSON.parse(localStorage.getItem("history") || "[]");
+  const { durations, total } = computeDurations(steps);
 
   history.unshift({
     date: new Date().toLocaleDateString(),
     steps: [...steps],
-    totalMinutes,
-    totalFormatted: `${Math.floor(totalMinutes / 60)} h ${totalMinutes % 60} min`,
+    durations,
+    totalMinutes: total,
     sleepTime: sleepTime.value,
     sleepScore: sleepScore.value,
     note: dailyNote.value
@@ -267,16 +255,20 @@ function loadHistory() {
     const div = document.createElement("div");
     div.className = "history-entry";
 
-    let html = `<strong>${h.date}</strong><br>`;
-    if (h.totalFormatted) {
-      html += `<strong>Total routine:</strong> ${h.totalFormatted}<br><br>`;
-    }
+    let html = `<strong>${h.date}</strong><br><br>`;
 
     h.steps.forEach((t, i) => {
       if (i > 0 && t) {
-        html += `<strong>${stepNames[i]}:</strong> ${t}<br>`;
+        const d = h.durations?.[i];
+        html += `<strong>${stepNames[i]}:</strong> ${t}`;
+        if (d !== null && d !== undefined) html += ` (+${d} min)`;
+        html += "<br>";
       }
     });
+
+    if (h.totalMinutes !== undefined) {
+      html += `<br><strong>Total routine:</strong> ${h.totalMinutes} min<br>`;
+    }
 
     if (h.sleepTime) html += `<br><strong>Sleep:</strong> ${h.sleepTime}<br>`;
     if (h.sleepScore) html += `<strong>Score:</strong> ${h.sleepScore}<br>`;
@@ -298,12 +290,12 @@ function exportHistoryCSV() {
     return;
   }
 
-  let csv = "Date,TotalDuration,Step,Time,SleepTime,SleepScore,Note\n";
+  let csv = "Date,Step,Time,Duration(min),TotalRoutine(min),SleepTime,SleepScore,Note\n";
 
   history.forEach(h => {
     h.steps.forEach((t, i) => {
       if (i > 0 && t) {
-        csv += `"${h.date}","${h.totalFormatted}","${stepNames[i]}","${t}","${h.sleepTime}","${h.sleepScore}","${(h.note || "").replace(/"/g,'""')}"\n`;
+        csv += `"${h.date}","${stepNames[i]}","${t}","${h.durations?.[i] ?? ""}","${h.totalMinutes ?? ""}","${h.sleepTime}","${h.sleepScore}","${(h.note || "").replace(/"/g,'""')}"\n`;
       }
     });
   });
@@ -362,19 +354,4 @@ function restoreDailyInputs() {
   sleepTime.value = d.sleepTime || "";
   sleepScore.value = d.sleepScore || "";
   dailyNote.value = d.dailyNote || "";
-}
-
-/* =====================
-   MANUAL TOTAL (BUTTON)
-   ===================== */
-function showTotalDuration() {
-  const totalMinutes = calculateTotalDurationMinutes();
-  const h = Math.floor(totalMinutes / 60);
-  const m = totalMinutes % 60;
-
-  let msg = "Total routine duration:\n";
-  if (h > 0) msg += `${h} h `;
-  msg += `${m} min`;
-
-  alert(msg);
 }
