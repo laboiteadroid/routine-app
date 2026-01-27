@@ -70,6 +70,12 @@ function nowFormatted() {
   }).replace(":", " h ");
 }
 
+function formatMinutesToHHMM(totalMinutes) {
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return `${hours}h${minutes.toString().padStart(2, "0")}`;
+}
+
 /* =====================
    CURRENT STEP
    ===================== */
@@ -267,7 +273,7 @@ function loadHistory() {
     });
 
     if (h.totalMinutes !== undefined) {
-      html += `<br><strong>Total routine:</strong> ${h.totalMinutes} min<br>`;
+      html += `<br><strong>Total routine:</strong> ${formatMinutesToHHMM(h.totalMinutes)}<br>`;
     }
 
     if (h.sleepTime) html += `<br><strong>Sleep:</strong> ${h.sleepTime}<br>`;
@@ -354,9 +360,4 @@ function restoreDailyInputs() {
   sleepTime.value = d.sleepTime || "";
   sleepScore.value = d.sleepScore || "";
   dailyNote.value = d.dailyNote || "";
-}
-function formatMinutesToHHMM(totalMinutes) {
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-  return `${hours}h${minutes.toString().padStart(2, '0')}`;
-}
+                        }
